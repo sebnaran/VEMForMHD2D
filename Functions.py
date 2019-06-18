@@ -327,20 +327,20 @@ def StandardElement(Element,EdgeNodes,Nodes,Ori):
     #Counterclockwise direction and rotation by pi/2 in the counterclockwise direction of the tangential vector
     #will result in an outward normal vector.
     #The last vertex,edge will be the first. This is in order to complete the loop.
-    N=len(Element)
-    OrientedEdges=[0]*(N+1)
-    OrientedVertices=[0]*(N+1)
+    N                = len(Element)
+    OrientedEdges    = [0]*(N+1)
+    OrientedVertices = [0]*(N+1)
     
     for i in range(N):
         if Ori[i]==1:
-            OrientedEdges[i]=EdgeNodes[Element[i]] #If they are "well-oriented" then do not alter them
+            OrientedEdges[i] = EdgeNodes[Element[i]] #If they are "well-oriented" then do not alter them
         else:
-            [v1,v2]=EdgeNodes[Element[i]] #Otherwise reverse the order of their vertices
-            OrientedEdges[i]=[v2,v1]
+            [v1,v2]          = EdgeNodes[Element[i]] #Otherwise reverse the order of their vertices
+            OrientedEdges[i] = [v2,v1]
 
-        OrientedVertices[i]=Nodes[OrientedEdges[i][0]]
-    OrientedEdges[N]=OrientedEdges[0]
-    OrientedVertices[N]=OrientedVertices[0]
+        OrientedVertices[i]  = Nodes[OrientedEdges[i][0]]
+    OrientedEdges[N]    = OrientedEdges[0]
+    OrientedVertices[N] = OrientedVertices[0]
     return OrientedVertices,OrientedEdges
 
 
@@ -436,81 +436,139 @@ def LocalMassMatrix(N,R,n,A,nu):
     #And finally we put the two matrices together
     return M0+M1*gamma
     
+#The following three functions are necessary for the construction of the 
+#mass matrix in the nodal space.
+def m1(x,y,xP,yP):
+        return 1
+
+def m2(x,y,xP,yP):
+        return x-xP
+
+def m3(x,y,xP,yP):
+        return y-yP
+
+def P0(ElNodes,func,xP,yP):
+        po = 0
+        for node in ElNodes:
+                x  = node[0]
+                y  = node[1]
+                po = po+func(x,y,xP,yP)
+        return po/len(ElNodes)
+
+def GiveNodes(Element,EdgeNodes,Nodes):
+	#this routine will, given an element, return a list with its nodes
+	ElNodes = [[]]*len(Element)
+	i       = 0
+	for Edge in Element:
+		EdNodes    = EdgeNodes[Edge]
+		ElNodes[i] = Nodes[EdNodes[0]]
+		i          = i+1
+	return ElNodes
 
 
 def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #This routine will compute the local mass matrix in the edge-based space E
     #Here we must ensure that the orientation of the elements is such that
     #We have an orientation for the edges that respects stoke's theorem
-    n = len(Element)
-    Dim = len(Basis)
+    n                      = len(Element)
+    Dim                    = len(Basis)
     xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
-    nu = DiffusionCoeff(xP,yP)
-    NE = np.zeros((n,2))
-    RE = np.zeros((n,2))
-    NV = np.ones((n,1))*nu
-    RV = np.zeros((n,1))
+    nu                     = DiffusionCoeff(xP,yP)
+    NE                     = np.zeros((n,2))
+    RE                     = np.zeros((n,2))
     
     for i in range(n):
-        x1 = Vertices[i][0]
-        y1 = Vertices[i][1]
-        x2 = Vertices[i+1][0]
-        y2 = Vertices[i+1][1]
+        x1         = Vertices[i][0]
+        y1         = Vertices[i][1]
+        x2         = Vertices[i+1][0]
+        y2         = Vertices[i+1][1]
         lengthEdge = math.sqrt((x2-x1)**2+(y2-y1)**2)
-        #print('dif in x')
-        #print(x2-x1)
-        #print('dif in y')
-        #print(y2-y1)
-        #print('Length e')
-        #print(lengthEdge)
-        NE[i][0] = (y2-y1)*Ori[i]*lengthEdge**-1
-        NE[i][1] = (x1-x2)*Ori[i]*lengthEdge**-1
-        RE[i][0] = (0.5*(x1+x2)-xP)*Ori[i]*lengthEdge #These formulas are derived in the tex-document
-        RE[i][1] = (0.5*(y1+y2)-yP)*Ori[i]*lengthEdge
+        NE[i][0]   = (y2-y1)*Ori[i]*lengthEdge**-1
+        NE[i][1]   = (x1-x2)*Ori[i]*lengthEdge**-1
+        RE[i][0]   = (0.5*(x1+x2)-xP)*Ori[i]*lengthEdge #These formulas are derived in the tex-document
+        RE[i][1]   = (0.5*(y1+y2)-yP)*Ori[i]*lengthEdge
     ME = LocalMassMatrix(NE,RE,n,A,1)
     #WE=LocalMassMatrix(RE,NE,n,A,1)
     
-    
-    
-    x1n = Vertices[n-1][0] #first vertex of n-1th-edge
-    y1n = Vertices[n-1][1]
-    
-    x2n = Vertices[0][0]
-    y2n = Vertices[0][1] #second vertex of n-1th edge
-    
-    x11 = x2n #first vertex of first edge
-    y11 = y2n
-    
-    x21 = Vertices[1][0]
-    y21 = Vertices[1][1]  #second vertex of first edge
-    
-    omegan2 = (x2n-x1n)*((yP-y2n)+(2*yP-y1n-y2n))/6
-    omega11 = (x21-x11)*((yP-y11)+(2*yP-y11-y21))/6
-    RV[0] = omegan2+omega11
-   
-    for i in range(1,n):
-        
-        x1iminusone = Vertices[i-1][0] #first vertex of i-1th-edge
-        y1iminusone = Vertices[i-1][1]
-               
-        x2iminusone = Vertices[i][0]    
-        y2iminusone = Vertices[i][1] #second vertex of i-1th edge
+    #########################
+    #Here we will construct the local nodal mass matrix
 
-        x1i = x2iminusone #first vertex of i+1 edge
-        y1i = y2iminusone
+    OrVert,OrEdg = StandardElement(Element,EdgeNodes,Nodes,Ori)
+    ElNodes      = OrVert[0:n]    
+    G            = np.zeros((3,3))
     
-        x2i = Vertices[i+1][0] #second vertex of i+1 edge
-        y2i = Vertices[i+1][1]  
-        
-        omega2iminusone = (x2iminusone-x1iminusone)*((yP-y2iminusone)+\
-                                                   (2*yP-y1iminusone-y2iminusone))/6
-        omega1i = (x2i-x1i)*((yP-y1i)+(2*yP-y2i-y1i))/6   
-        
-        RV[i] = omega2iminusone+omega1i
-        
-    MV = LocalMassMatrix(NV,RV,n,A,nu)
-    #WV=LocalMassMatrix(RV,NV,n,A,nu)
+    G[0,0] = 1
+
+    G[0,1] = P0(ElNodes,m2,xP,yP)
+    G[1,1] = A
     
+    G[0,2] = P0(ElNodes,m3,xP,yP)
+    G[2,2] = A
+
+    B      = np.ones((3,n))/n
+    H      = np.zeros((3,3))
+    H[0,0] = A
+    i      = 0
+    for Edge in OrEdg:
+        x1       = Nodes[Edge[0]][0]
+	y1       = Nodes[Edge[0]][1]
+	
+        x2       = Nodes[Edge[1]][0]
+        y2       = Nodes[Edge[1]][1]
+        
+        lenedge  = math.sqrt((x2-x1)**2+(y2-y1)**2)
+        taux     = (x2-x1)/lenedge
+        tauy     = (y2-y1)/lenedge
+        
+        B[1,i]   =  0.5*lenedge*tauy
+        B[2,i]   = -0.5*lenedge*taux
+        i        = i+1
+
+	h        = lenedge/3
+	nx       =  tauy
+        ny       = -taux
+        costheta = (x2-x1)/lenedge
+        sintheta = (y2-y1)/lenedge
+        
+        xot      = x1+h*costheta
+        yot      = y1+h*sintheta
+        
+        xtt      = x1+2*h*costheta
+        ytt      = y1+2*h*sintheta
+        
+        H[1,1]   = H[1,1] + h*nx*( m2(x1,y1,xP,yP)**3+\
+                                 3*m2(xot,yot,xP,yP)**3+\
+                                 3*m2(xtt,ytt,xP,yP)**3+\
+                                   m2(x2,y2,xP,yP)**3 )/8  
+
+        H[2,2]   = H[2,2] + h*nx*( m3(x1,y1,xP,yP)**3+\
+                                 3*m3(xot,yot,xP,yP)**3+\
+                                 3*m3(xtt,ytt,xP,yP)**3+\
+                                   m3(x2,y2,xP,yP)**3 )/8       
+   
+
+        H[1,2]   = H[1,2] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
+                                   3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
+                                   3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
+                                     m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
+
+        H[2,1]   = H[2,1] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
+                                   3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
+                                   3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
+                                     m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
+
+   
+    
+    D      = np.ones((n,3))
+
+    D[:,1] = [m2(x,y,xP,yP) for [x,y] in ElNodes]    
+    D[:.2] = [m3(x,y,xP,yP) for [x,y] in ElNodes]
+
+    Pistar = inv(G).dot(B)
+    Pi     = D.dot(Pistar)
+    Id     = np.identity(n)
+    MV     = np.transpose(Pistar).dot(H.dot(Pistar))+A*np.transpose(Id-Pi).dot(Id-Pi)    
+   
     NJ = np.zeros((Dim,n))
     
     
@@ -565,9 +623,7 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
         l = l+1
     
     MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
-    #MJ = np.transpose(MJ).dot(MV)
     MJ = MV.dot(MJ)
-    #print(MJ)
     return ME,MV,MJ,Edges
 
 def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
@@ -635,10 +691,10 @@ def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
 def projV(func,Nodes):
     #This function will, provided a function and a set of nodes, compute the projection onto 
     #the space of node-based functions.
-    n=len(Nodes)
-    proj=np.zeros((n,1))
+    n    = len(Nodes)
+    proj = np.zeros((n,1))
     for i in range(n):
-        proj[i]=func(Nodes[i][0],Nodes[i][1])
+        proj[i] = func(Nodes[i][0],Nodes[i][1])
     return proj
 
 def projE(Func,EdgeNodes,Nodes):
@@ -806,185 +862,5 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
     ElectricError = math.sqrt(ElectricError)
     
     return Bh,Eh,MagneticError,ElectricError
-
-
-
-
-
-
-
-
-
-#Here is the code that we want to run.  
-   
-   
-###Voronoi
-    
-
-    
-    
-    
-ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.124524.txt','PVh=0.221367.txt',\
-                  'PVh=0.0633169.txt']#,'PVh=0.0314634.txt','PVh=0.0165378.txt']
-
-h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,\
-     0.008787156237382746]#, 0.004419676355414694,0.0022139558199118672]
-    
-    
-
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-#h=[1/(2**(2+i)) for i in range(len(Files))]
-FiveVoronoiElectricError=[0]*len(ProcessedFiles)
-FiveVoronoiMagneticError=[0]*len(ProcessedFiles)
-i=0
-for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
-    #dt = h[i]**2
-    #dt = h[i]
-    print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
-    
-    Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    print('Computed Numerical Solution')
-    #VisualizeE(Eh,Nodes)
-    FiveVoronoiElectricError[i]=Eerror
-    FiveVoronoiMagneticError[i]=Berror
-    i=i+1
-    
-with open('FiveEMVoronoi.txt', "wb") as fp:   #Pickling
-    pickle.dump([FiveVoronoiElectricError,FiveVoronoiMagneticError], fp)
-
-
-
-#########The Last two
-
-
-#Triangles
-
-ProcessedFiles = ['PTh=0.0179733.txt']#,'PTh=0.0089405.txt']
-
-
-h = [0.0031355820733239914]#,0.0015683308166871686]
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-#h=[1/(2**(2+i)) for i in range(len(Files))]
-twoTriangleElectricError=[0]*len(ProcessedFiles)
-twoTriangleMagneticError=[0]*len(ProcessedFiles)
-i=0
-
-
-for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
-    #dt = h[i]
-    print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
-    #print('Retrieved The Mesh')
-    Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    print('Computed Numerical Solution')
-    #VisualizeE(Eh,Nodes)
-    twoTriangleElectricError[i]=Eerror
-    twoTriangleMagneticError[i]=Berror
-    i=i+1
-    
-
-with open('twoTriangleEMError.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoTriangleElectricError,twoTriangleMagneticError], fp)
-    
-    
-    
-#Squares
-
-
-
-ProcessedFiles = ['PertPQh=0.0155408.txt']#,'PertPQh=0.00779181.txt']
-
-
-h = [0.005494505494505494]#,0.0027548209366391185]
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-
-twoQuadElectricError=[0]*len(ProcessedFiles)
-twoQuadMagneticError=[0]*len(ProcessedFiles)
-i=0
-for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
-    #dt = h[i]**2
-    #dt = h[i]
-    print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
-    
-    Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    print('Computed Numerical Solution')
-    VisualizeE(Eh,Nodes)
-    twoQuadElectricError[i]=Eerror
-    twoQuadMagneticError[i]=Berror
-    i=i+1
-
-
-with open('twoQuadEMError.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoQuadElectricError,twoQuadMagneticError], fp)
-    
-
-
-#Voronoi
-
-
-
-ProcessedFiles = ['PVh=0.0314634.txt']#,'PVh=0.0165378.txt']
-
-h = [0.004419676355414694]#,0.0022139558199118672]
-    
-    
-
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-#h=[1/(2**(2+i)) for i in range(len(Files))]
-twoVoronoiElectricError=[0]*len(ProcessedFiles)
-twoVoronoiMagneticError=[0]*len(ProcessedFiles)
-i=0
-for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
-    #dt = h[i]**2
-    #dt = h[i]
-    print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
-    
-    Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    print('Computed Numerical Solution')
-    #VisualizeE(Eh,Nodes)
-    twoVoronoiElectricError[i]=Eerror
-    twoVoronoiMagneticError[i]=Berror
-    i=i+1
-    
-with open('twoEMVoronoi.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoVoronoiElectricError,twoVoronoiMagneticError], fp)
-
-
-
-
-
-
-
-
-
-
-
 
 
