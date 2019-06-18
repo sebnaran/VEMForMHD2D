@@ -13,31 +13,31 @@ from scipy.sparse.linalg import spsolve
 from Functions import *
 
 
+##############################################################Voronoi
+
+
+
+ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt']#,'PVh=0.0345033.txt','PVh=0.0174767.txt',\
+#                  'PVh=0.0087872.txt']
+
+h = [0.12803687993289598, 0.06772854614785964]#, 0.03450327796711771, 0.017476749542968805,\
+#     0.008787156237382746]
 
 
 
 
-ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.124524.txt','PVh=0.221367.txt',\
-                  'PVh=0.0633169.txt']#,'PVh=0.0314634.txt','PVh=0.0165378.txt']
+Basis                    = [Poly1,Poly2,Poly]
+T                        = 0.25
 
-h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,\
-     0.008787156237382746]#, 0.004419676355414694,0.0022139558199118672]
-
-
-
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-#h=[1/(2**(2+i)) for i in range(len(Files))]
-FiveVoronoiElectricError=[0]*len(ProcessedFiles)
-FiveVoronoiMagneticError=[0]*len(ProcessedFiles)
-i=0
+FiveVoronoiElectricError = [0]*len(ProcessedFiles)
+FiveVoronoiMagneticError = [0]*len(ProcessedFiles)
+i                        = 0
 for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
+    dt = 0.05*h[i]**2
     #dt = h[i]**2
     #dt = h[i]
     print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
+    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)
 
     Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
                                     BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
@@ -45,28 +45,32 @@ for Pfile in ProcessedFiles:
                                #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
     print('Computed Numerical Solution')
     #VisualizeE(Eh,Nodes)
-    FiveVoronoiElectricError[i]=Eerror
-    FiveVoronoiMagneticError[i]=Berror
+    FiveVoronoiElectricError[i] = Eerror
+    FiveVoronoiMagneticError[i] = Berror
     i=i+1
 
-with open('FiveEMVoronoi.txt', "wb") as fp:   #Pickling
-    pickle.dump([FiveVoronoiElectricError,FiveVoronoiMagneticError], fp)
+#with open('FiveEMVoronoi.txt', "wb") as fp:   #Pickling
+#    pickle.dump([FiveVoronoiElectricError,FiveVoronoiMagneticError], fp)
+
+print('Voronoi Electric = '+str(FiveVoronoiElectricError))
+print('Voronoi Magnetic = '+str(FiveVoronoiMagneticError))
 
 
 
+#########################################Triangles
 
-#Triangles
-
-ProcessedFiles = ['PTh=0.0179733.txt']#,'PTh=0.0089405.txt']
-
-
-h = [0.0031355820733239914]#,0.0015683308166871686]
+ProcessedFiles = ['PTh=0.101015.txt','PTh=0.051886.txt']#,'PTh=0.0251418.txt','PTh=0.0125255.txt',\
+#         'PTh=0.0062613.txt']
+ 
+ 
+h = [0.10101525445522107, 0.05018856132284956]#, 0.025141822757713456, 0.012525468249897755,\
+#     0.006261260829309998]
 
 Basis = [Poly1,Poly2,Poly]
-T=0.25
+T     = 0.25
 #h=[1/(2**(2+i)) for i in range(len(Files))]
-twoTriangleElectricError=[0]*len(ProcessedFiles)
-twoTriangleMagneticError=[0]*len(ProcessedFiles)
+FiveTriangleElectricError = [0]*len(ProcessedFiles)
+FiveTriangleMagneticError = [0]*len(ProcessedFiles)
 i=0
 
 
@@ -87,25 +91,26 @@ for Pfile in ProcessedFiles:
     i=i+1
 
 
-with open('twoTriangleEMError.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoTriangleElectricError,twoTriangleMagneticError], fp)
+print('Triangle Electric = '+str(FiveTriangleElectricError))
+print('Triangle Magnetic = '+str(FiveTriangleMagneticError))
 
 
 
-#Squares
+#######################Quadrilaterals
 
+     
+ProcessedFiles = ['PertPQh=0.166666.txt','PertPQh=0.0833333.txt']#,'PertPQh=0.043478.txt',\
+                 # 'PertPQh=0.021739.txt','PertPQh=0.010989.txt']
+ 
+h = [0.16666666666666666, 0.08333333333333333]#, 0.043478260869565216, 0.021739130434782608,\
+#     0.010989010989010988]
 
-
-ProcessedFiles = ['PertPQh=0.0155408.txt']#,'PertPQh=0.00779181.txt']
-
-
-h = [0.005494505494505494]#,0.0027548209366391185]
 
 Basis = [Poly1,Poly2,Poly]
-T=0.25
+T     = 0.25
 
-twoQuadElectricError=[0]*len(ProcessedFiles)
-twoQuadMagneticError=[0]*len(ProcessedFiles)
+FiveQuadElectricError=[0]*len(ProcessedFiles)
+FiveQuadMagneticError=[0]*len(ProcessedFiles)
 i=0
 for Pfile in ProcessedFiles:
     dt=0.05*h[i]**2
@@ -124,46 +129,6 @@ for Pfile in ProcessedFiles:
     twoQuadMagneticError[i]=Berror
     i=i+1
 
-
-with open('twoQuadEMError.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoQuadElectricError,twoQuadMagneticError], fp)
-
-
-
-#Voronoi
-
-
-
-ProcessedFiles = ['PVh=0.0314634.txt']#,'PVh=0.0165378.txt']
-
-h = [0.004419676355414694]#,0.0022139558199118672]
-
-
-
-
-Basis = [Poly1,Poly2,Poly]
-T=0.25
-#h=[1/(2**(2+i)) for i in range(len(Files))]
-twoVoronoiElectricError=[0]*len(ProcessedFiles)
-twoVoronoiMagneticError=[0]*len(ProcessedFiles)
-i=0
-for Pfile in ProcessedFiles:
-    dt=0.05*h[i]**2
-    #dt = h[i]**2
-    #dt = h[i]
-    print(Pfile)
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations=ProcessedMesh(Pfile)
-
-    Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               #EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
-    print('Computed Numerical Solution')
-    #VisualizeE(Eh,Nodes)
-    twoVoronoiElectricError[i]=Eerror
-    twoVoronoiMagneticError[i]=Berror
-    i=i+1
-
-with open('twoEMVoronoi.txt', "wb") as fp:   #Pickling
-    pickle.dump([twoVoronoiElectricError,twoVoronoiMagneticError], fp)
+print('Quad Electric = '+str(FiveQuadElectricError))
+print('Quad Magnetic = '+str(FiveQuadMagneticError))
 

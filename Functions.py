@@ -455,16 +455,6 @@ def P0(ElNodes,func,xP,yP):
                 po = po+func(x,y,xP,yP)
         return po/len(ElNodes)
 
-def GiveNodes(Element,EdgeNodes,Nodes):
-	#this routine will, given an element, return a list with its nodes
-	ElNodes = [[]]*len(Element)
-	i       = 0
-	for Edge in Element:
-		EdNodes    = EdgeNodes[Edge]
-		ElNodes[i] = Nodes[EdNodes[0]]
-		i          = i+1
-	return ElNodes
-
 
 def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #This routine will compute the local mass matrix in the edge-based space E
@@ -495,8 +485,9 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
 
     OrVert,OrEdg = StandardElement(Element,EdgeNodes,Nodes,Ori)
     ElNodes      = OrVert[0:n]    
+    ElEdges      = OrEdg[0:n]
     G            = np.zeros((3,3))
-    
+
     G[0,0] = 1
 
     G[0,1] = P0(ElNodes,m2,xP,yP)
@@ -508,27 +499,26 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     B      = np.ones((3,n))/n
     H      = np.zeros((3,3))
     H[0,0] = A
-    i      = 0
-    for Edge in OrEdg:
-        x1       = Nodes[Edge[0]][0]
-	y1       = Nodes[Edge[0]][1]
-	
-        x2       = Nodes[Edge[1]][0]
-        y2       = Nodes[Edge[1]][1]
-        
-        lenedge  = math.sqrt((x2-x1)**2+(y2-y1)**2)
-        taux     = (x2-x1)/lenedge
-        tauy     = (y2-y1)/lenedge
-        
-        B[1,i]   =  0.5*lenedge*tauy
-        B[2,i]   = -0.5*lenedge*taux
-        i        = i+1
 
-	h        = lenedge/3
+    for i in range(n):
+        x1         = Vertices[i][0]
+        y1         = Vertices[i][1]
+        x2         = Vertices[i+1][0]
+        y2         = Vertices[i+1][1]
+        
+        lengthedge  = math.sqrt((x2-x1)**2+(y2-y1)**2)
+        taux        = (x2-x1)/lengthedge
+        tauy        = (y2-y1)/lengthedge
+
+        B[1,i]      =  0.5*lengthedge*tauy
+        B[2,i]      = -0.5*lengthedge*taux
+
+
+	h        = lengthedge/3
 	nx       =  tauy
         ny       = -taux
-        costheta = (x2-x1)/lenedge
-        sintheta = (y2-y1)/lenedge
+        costheta = (x2-x1)/lengthedge
+        sintheta = (y2-y1)/lengthedge
         
         xot      = x1+h*costheta
         yot      = y1+h*sintheta
@@ -557,14 +547,14 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
                                    3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
                                      m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
 
+  
    
-    
     D      = np.ones((n,3))
 
     D[:,1] = [m2(x,y,xP,yP) for [x,y] in ElNodes]    
-    D[:.2] = [m3(x,y,xP,yP) for [x,y] in ElNodes]
+    D[:,2] = [m3(x,y,xP,yP) for [x,y] in ElNodes]
 
-    Pistar = inv(G).dot(B)
+    Pistar = np.linalg.inv(G).dot(B)
     Pi     = D.dot(Pistar)
     Id     = np.identity(n)
     MV     = np.transpose(Pistar).dot(H.dot(Pistar))+A*np.transpose(Id-Pi).dot(Id-Pi)    
