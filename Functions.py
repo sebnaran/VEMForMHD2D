@@ -509,7 +509,7 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     B      = np.ones((3,n))/n
     H      = np.zeros((3,3))
     H[0,0] = A
-
+            
     for i in range(n):
         x1         = Vertices[i][0]
         y1         = Vertices[i][1]
@@ -522,43 +522,41 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
 
         B[1,i]      =  0.5*lengthedge*tauy
         B[2,i]      = -0.5*lengthedge*taux
-
-
-	h        = lengthedge/3
-	nx       =  tauy
-        ny       = -taux
-        costheta = (x2-x1)/lengthedge
-        sintheta = (y2-y1)/lengthedge
+        h           = lengthedge/3
+        nx          = tauy
+        ny          = -taux
+        costheta    = (x2-x1)/lengthedge
+        sintheta    = (y2-y1)/lengthedge
         
-        xot      = x1+h*costheta
-        yot      = y1+h*sintheta
+        xot         = x1+h*costheta
+        yot         = y1+h*sintheta
         
-        xtt      = x1+2*h*costheta
-        ytt      = y1+2*h*sintheta
+        xtt         = x1+2*h*costheta
+        ytt         = y1+2*h*sintheta
         
-        H[1,1]   = H[1,1] + h*nx*( m2(x1,y1,xP,yP)**3+\
+        H[1,1]      = H[1,1] + h*nx*( m2(x1,y1,xP,yP)**3+\
                                  3*m2(xot,yot,xP,yP)**3+\
                                  3*m2(xtt,ytt,xP,yP)**3+\
                                    m2(x2,y2,xP,yP)**3 )/8  
 
-        H[2,2]   = H[2,2] + h*nx*( m3(x1,y1,xP,yP)**3+\
+        H[2,2]      = H[2,2] + h*nx*( m3(x1,y1,xP,yP)**3+\
                                  3*m3(xot,yot,xP,yP)**3+\
                                  3*m3(xtt,ytt,xP,yP)**3+\
                                    m3(x2,y2,xP,yP)**3 )/8       
    
 
-        H[1,2]   = H[1,2] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
+        H[1,2]      = H[1,2] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
                                    3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
                                    3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
                                      m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
 
-        H[2,1]   = H[2,1] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
+        H[2,1]      = H[2,1] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
                                    3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
                                    3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
                                      m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
 
   
-   
+       
     D      = np.ones((n,3))
 
     D[:,1] = [m2(x,y,xP,yP) for [x,y] in ElNodes]    
