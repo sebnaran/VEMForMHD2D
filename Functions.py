@@ -762,7 +762,7 @@ def primdiv(ElementEdges,EdgeNodes,Nodes):
 #Solver
 
 
-def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt):
+def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
     #the given time.
     #The boundary conditions are given above 
@@ -780,7 +780,7 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
         D[i,i]=1
     D = D.tocsr()
    
-    Aprime = MV+0.5*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
     Aprime = D.dot(Aprime)
     #A = np.zeros((NumberInternalNodes,NumberInternalNodes))
     A = lil_matrix((NumberInternalNodes,NumberInternalNodes))
