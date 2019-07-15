@@ -811,7 +811,7 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
         #i.e. The boundary values of the electric field
         for NodeNumber in BoundaryNodes:
             Node = Nodes[NodeNumber]
-            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+0.5*dt)
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
         
         #Solve  for the internal values of the electric field
         
@@ -837,7 +837,7 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
     def ContB(x,y):
         return ExactB(x,y,T)
     def ContE(x,y):
-        return ExactE(x,y,T-0.5*dt)
+        return ExactE(x,y,T-(1-theta)*dt)
     
     Bex = projE(ContB,EdgeNodes,Nodes)
     Eex = projV(ContE,Nodes)

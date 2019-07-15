@@ -15,7 +15,7 @@ from Functions import *
 
 ##############################################################Voronoi
 
-theta = 0.5
+theta = 0.25 
 
 ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.0345033.txt','PVh=0.0174767.txt',\
                   'PVh=0.0087872.txt']
