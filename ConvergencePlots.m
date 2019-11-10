@@ -13,7 +13,7 @@ ElectricError =  [0.5098721095770006, 0.12175648676696989, 0.03224235083294914, 
 
 MagneticError = [2.0042181007879325, 0.9781866298047875, 0.5502616339498934, 0.28069706397737304, 0.13768142439140277];
 
-secondtitle = 'Triangles';
+%secondtitle = 'Triangles';
 
 
 
@@ -24,13 +24,14 @@ figure(1)
 
 clf
 
-loglog(h,ElectricError,'o')
+loglog(h,ElectricError,'o','LineWidth',3)
 %plot(log(h),log(ElectricError));
 
 hold on
 
 
-loglog(h,ElectricError)
+loglog(h,ElectricError,'LineWidth',2,'Color','k')
+set(gca,'FontSize',15)
 %loglog(h,10^(1)*h.^(1.8))
 hold on
 %Pick a basis point for the triangle
@@ -51,16 +52,16 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
+loglog(x,y,'LineWidth',2,'Color','k')
 
-text(xseed*0.7+0.3*xnext,ynext+0.001+0.0005,'1')
-text(xseed-0.0005,0.5*yseed+0.5*ynext,'2')
-
-
+text(xseed*0.7+0.3*xnext,ynext+0.003,'1','Fontsize',15)
+text(xseed-0.001,0.5*yseed+0.5*ynext,'2','Fontsize',15)
 
 
 
-title('Triangular Mesh')
+
+
+%title('Triangular Mesh')
 
 
 
@@ -74,7 +75,7 @@ upaxis = 0.65;
 downaxis = 0.0015;
 
 axis([leftaxis rightaxis downaxis upaxis])
-xlabel('Mesh Size')
+%xlabel('Mesh Size')
 
 ax = log10(leftaxis);
 bx = log10(rightaxis);
@@ -85,11 +86,11 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-ylabel('Error On Electric Field')
+%ylabel('Error On Electric Field')
 
-xticks(tx)
-yticks(ty)
-grid on
+%xticks(tx)
+%yticks(ty)
+%grid on
 
 
 
@@ -98,17 +99,17 @@ grid on
 
 figure(2)
 clf
-loglog(h,MagneticError,'o')
+loglog(h,MagneticError,'o','LineWidth',3)
 hold on
-loglog(h,MagneticError)
-
+loglog(h,MagneticError,'LineWidth',2,'Color','k')
+set(gca,'FontSize',15)
 
 
 hold on
 
 %Pick a basis point for the triangle
 xseed = h(4)*0.05+0.95*h(5);
-yseed = 0.16;
+yseed = 0.18;
 %desiredSlope Of triangle
 slope = 1;
 %Another x point
@@ -124,14 +125,11 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
+loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1')
-text(xseed-0.001/1.5,0.5*yseed+0.5*ynext,'1')
-
-
-
+text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1','FontSize',15)
+text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','FontSize',15)
 
 
 
@@ -139,9 +137,12 @@ text(xseed-0.001/1.5,0.5*yseed+0.5*ynext,'1')
 
 
 
-title('Triangular Mesh')
-xlabel('Mesh Size')
-ylabel('Error On Magnetic Field')
+
+
+
+%title('Triangular Mesh')
+%xlabel('Mesh Size')
+%ylabel('Error On Magnetic Field')
 
 
 %axis([0.01-0.005 0.1+0.01 0.1+0.1 3])
@@ -152,7 +153,7 @@ downaxis = 0.125;
 upaxis = 2.15;
 
 axis([leftaxis rightaxis downaxis upaxis])
-xlabel('Mesh Size')
+%xlabel('Mesh Size')
 
 ax = log10(leftaxis);
 bx = log10(rightaxis);
@@ -165,10 +166,10 @@ ty = 10.^(ty);
 
 
 
-xticks(tx)
-yticks(ty)
+%xticks(tx)
+%yticks(ty)
 
-grid on
+%grid on
 
 
 
@@ -211,7 +212,7 @@ ElectricError = [0.1505488392083424, 0.07540240822978826, 0.01964292814740662, 0
 MagneticError = [1.3485966107898497, 0.515270877390314, 0.22681651972361622, 0.10557908129467171, 0.05201601043760578];
                                                       
 
-secondtitle = 'On Perturbed squares';
+%secondtitle = 'On Perturbed squares';
 
 
 %Plotting the electric field
@@ -220,13 +221,13 @@ figure(1)
 
 clf
 
-loglog(h,ElectricError,'o')
+loglog(h,ElectricError,'o','LineWidth',3)
 %plot(log(h),log(ElectricError));
 
 hold on
 
 
-loglog(h,ElectricError)
+loglog(h,ElectricError,'LineWidth',2,'Color','k')
 %loglog(h,10^(1)*h.^(1.8))
 hold on
 %Pick a basis point for the triangle
@@ -247,19 +248,19 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
-
-text(xseed*0.7+0.3*xnext,ynext+0.001,'1')
-text(xseed-0.001,0.5*yseed+0.5*ynext,'2')
-
-
+loglog(x,y,'r','LineWidth',2,'Color','k')
+set(gca,'FontSize',15)
+text(xseed*0.7+0.3*xnext,ynext+0.002,'1','FontSize',15)
+text(xseed-0.002,0.5*yseed+0.5*ynext,'2','FontSize',15)
 
 
 
-title('Perturbed Quadritateral Mesh')
+
+
+%title('Perturbed Quadrilateral Mesh')
 %axis([0.01 0.25 (0.001+0.0001)/2 .15])
-xlabel('Mesh Size')
-ylabel('Error On Electric Field')
+%xlabel('Mesh Size')
+%ylabel('Error On Electric Field')
 
 leftaxis = 0.009;
 rightaxis = 0.18;
@@ -280,14 +281,14 @@ ty = 10.^(ty);
 
 
 
-xticks(tx)
-yticks(ty)
+%xticks(tx)
+%yticks(ty)
 
 
 
 
 
-grid on
+%grid on
 
 
 
@@ -295,9 +296,9 @@ grid on
 
 figure(2)
 clf
-loglog(h,MagneticError,'o')
+loglog(h,MagneticError,'o','LineWidth',3)
 hold on
-loglog(h,MagneticError)
+loglog(h,MagneticError,'LineWidth',2,'Color','k')
 
 
 
@@ -321,26 +322,26 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
+loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.001,'1')
-text(xseed-0.001,0.5*yseed+0.5*ynext,'1')
+text(xseed*0.7+0.3*xnext,ynext+0.01+0.01,'1','FontSize',15)
+text(xseed-0.0015,0.5*yseed+0.5*ynext,'1','FontSize',15)
 
-
-
-
-
+set(gca,'FontSize',15)
 
 
 
 
 
-title('Perturbed Quadrilateral Mesh')
-xlabel('Mesh Size')
-ylabel('Error On Magnetic Field')
+
+
+
+%title('Perturbed Quadrilateral Mesh')
+%xlabel('Mesh Size')
+%ylabel('Error On Magnetic Field')
 %axis([0.01 0.25 0.75*10^(-1)+0.25*0.01 1])
-grid on
+%grid on
 
 leftaxis = 0.009;
 rightaxis = 0.18;
@@ -361,8 +362,8 @@ ty = 10.^(ty);
 
 
 
-xticks(tx)
-yticks(ty)
+%xticks(tx)
+%yticks(ty)
 
 
 
@@ -391,7 +392,7 @@ MagneticError = [3.3226284919819693, 1.6827177392771193, 0.7955836030979955, 0.3
 
 
 
-secondtitle='Voronoi';
+%secondtitle='Voronoi';
 
 
 
@@ -399,13 +400,13 @@ figure(1)
 
 clf
 
-loglog(h,ElectricError,'o')
+loglog(h,ElectricError,'o','LineWidth',3)
 %plot(log(h),log(ElectricError));
 
 hold on
 
 
-loglog(h,ElectricError)
+loglog(h,ElectricError,'LineWidth',2,'Color','k')
 %loglog(h,10^(1)*h.^(1.8))
 hold on
 %Pick a basis point for the triangle
@@ -427,16 +428,16 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
+loglog(x,y,'LineWidth',2,'Color','k')
 
-text(xseed*0.7+0.3*xnext,ynext+0.001+0.0005,'1')
-text(xseed-0.0005,0.5*yseed+0.5*ynext,'2')
-
-
-
+text(xseed*0.7+0.3*xnext,ynext+0.001+0.0035,'1','FontSize',15)
+text(xseed-0.0012,0.5*yseed+0.5*ynext,'2','FontSize',15)
+set(gca,'FontSize',15)
 
 
-title('Voronoi Tesselation')
+
+
+%title('Voronoi Tesselation')
 
 
 
@@ -454,7 +455,7 @@ rightaxis = 0.15;
 upaxis = 0.8;
 downaxis = 0.002;
 axis([leftaxis rightaxis downaxis upaxis])
-xlabel('Mesh Size')
+%xlabel('Mesh Size')
 
 ax = log10(leftaxis);
 bx = log10(rightaxis);
@@ -465,11 +466,11 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-ylabel('Error On Electric Field')
+%ylabel('Error On Electric Field')
 
-xticks(tx)
-yticks(ty)
-grid on
+%xticks(tx)
+%yticks(ty)
+%grid on
 
 
 
@@ -478,9 +479,9 @@ grid on
 
 figure(2)
 clf
-loglog(h,MagneticError,'o')
+loglog(h,MagneticError,'o','LineWidth',3)
 hold on
-loglog(h,MagneticError)
+loglog(h,MagneticError,'LineWidth',2,'Color','k')
 
 
 
@@ -507,24 +508,24 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'r')
+loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1')
-text(xseed-0.001/1.5,0.5*yseed+0.5*ynext,'1')
-
-
-
+text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01+0.01,'1','FontSize',15)
+text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','fontSize',15)
 
 
 
 
+set(gca,'FontSize',15)
 
 
 
-title('Voronoi Tesselation')
-xlabel('Mesh Size')
-ylabel('Error On Magnetic Field')
+
+
+%title('Voronoi Tesselation')
+%xlabel('Mesh Size')
+%ylabel('Error On Magnetic Field')
 
 
 %axis([0.01-0.005 0.1+0.01 0.1+0.1 3])
@@ -538,7 +539,7 @@ rightaxis = 0.15;
 downaxis = 0.16;
 upaxis = 3.6;
 axis([leftaxis rightaxis downaxis upaxis])
-xlabel('Mesh Size')
+%xlabel('Mesh Size')
 
 ax = log10(leftaxis);
 bx = log10(rightaxis);
@@ -551,10 +552,10 @@ ty = 10.^(ty);
 
 
 
-xticks(tx)
-yticks(ty)
+%xticks(tx)
+%yticks(ty)
 
-grid on
+%grid on
 
 
 
