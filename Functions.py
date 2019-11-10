@@ -356,22 +356,22 @@ def StandardElement(Element,EdgeNodes,Nodes,Ori):
 
 def Centroid(Element,EdgeNodes,Nodes,Ori):
     #This function, when provided with an element, will return its centroid or barycenter.
-    N=len(Element)
-    Cx=0
-    Cy=0
-    A=0
+    N  = len(Element)
+    Cx = 0
+    Cy = 0
+    A  = 0
     Vertices,Edges = StandardElement(Element,EdgeNodes,Nodes,Ori)
     for i in range(N):
-        xi=Vertices[i][0]
-        yi=Vertices[i][1]
-        xiplusone=Vertices[i+1][0]
-        yiplusone=Vertices[i+1][1]
-        Cx=Cx+(xi+xiplusone)*(xi*yiplusone-xiplusone*yi) #This formula is in Wikipedia
-        Cy=Cy+(yi+yiplusone)*(xi*yiplusone-xiplusone*yi)
-        A=A+xi*yiplusone-xiplusone*yi
-    A=0.5*A
-    Cx=Cx/(6*A)
-    Cy=Cy/(6*A)
+        xi = Vertices[i][0]
+        yi = Vertices[i][1]
+        xiplusone = Vertices[i+1][0]
+        yiplusone = Vertices[i+1][1]
+        Cx        = Cx+(xi+xiplusone)*(xi*yiplusone-xiplusone*yi) #This formula is in Wikipedia
+        Cy        = Cy+(yi+yiplusone)*(xi*yiplusone-xiplusone*yi)
+        A         = A+xi*yiplusone-xiplusone*yi
+    A = 0.5*A
+    Cx = Cx/(6*A)
+    Cy = Cy/(6*A)
     return Cx,Cy,A,Vertices,Edges
 
 def InternalObjects(Boundary,Objects):
@@ -738,24 +738,27 @@ def primcurl(EdgeNodes,Nodes):
     curl = curl.tocsr()
     return curl
 
-def primdiv(ElementEdges,EdgeNodes,Nodes):
+def primdiv(ElementEdges,EdgeNodes,Nodes,Orientations):
     #this routine computes the primary divergence matrix
-    NEl=len(ElementEdges)
-    NE=len(EdgeNodes)
-    div=np.zeros((NEl,NE))
+    NEl = len(ElementEdges)
+    NE  = len(EdgeNodes)
+    div = np.zeros((NEl,NE))
     for i in range(NEl):
-        Element=ElementEdges[i]
-        N=len(Element)
+        Element = ElementEdges[i]
+        N       = len(Element)
+        Ori     = Orientations[i]
         for j in range(N):
-            Node1=EdgeNodes[Element[j]][0]
-            Node2=EdgeNodes[Element[j]][1]
-            x1=Nodes[Node1][0]
-            y1=Nodes[Node1][1] #these formulas are derived in the pdf document
-            x2=Nodes[Node2][0]
-            y2=Nodes[Node2][1]
-            lengthe=math.sqrt((x2-x1)**2+(y2-y1)**2)
-            xP,yP,A,Vertices,Edges,Ori=Centroid(Element,EdgeNodes,Nodes)
-            div[i,Element[j]]=Ori[j]*lengthe/A
+            Node1 = EdgeNodes[Element[j]][0]
+            Node2 = EdgeNodes[Element[j]][1]
+
+            x1    = Nodes[Node1][0]
+            y1    = Nodes[Node1][1] #these formulas are derived in the pdf document
+            x2    = Nodes[Node2][0]
+            y2    = Nodes[Node2][1]
+
+            lengthe                = math.sqrt((x2-x1)**2+(y2-y1)**2)
+            xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
+            div[i,Element[j]]      = Ori[j]*lengthe/A
     return div
 
 

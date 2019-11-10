@@ -12,10 +12,9 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from Functions import *
 
-
 ##############################################################Voronoi
 
-theta = 0.25
+theta = 0.5
 
 ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.0345033.txt','PVh=0.0174767.txt',\
                   'PVh=0.0087872.txt']
@@ -41,8 +40,8 @@ for Pfile in ProcessedFiles:
 
     Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
                                     BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta)
-    Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
-                               EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
+    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
+    #                           EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
     print('Computed Numerical Solution')
     #VisualizeE(Eh,Nodes)
     FiveVoronoiElectricError[i] = Eerror
@@ -130,4 +129,3 @@ print('Voronoi Magnetic = '+str(FiveVoronoiMagneticError))
 #
 #print('Quad Electric = '+str(FiveQuadElectricError))
 #print('Quad Magnetic = '+str(FiveQuadMagneticError))
-
