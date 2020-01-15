@@ -1,6 +1,6 @@
-shape = 'quads';
+%shape = 'quads';
 %shape = 'triangles';
-%shape = 'voronoi';
+shape = 'voronoi';
 
 switch shape
     case 'triangles'
@@ -9,30 +9,58 @@ switch shape
 h = [0.10101525445522107, 0.05018856132284956, 0.025141822757713456, 0.012525468249897755,...
      0.006261260829309998];
 
-ElectricError =  [0.5098721095770006, 0.12175648676696989, 0.03224235083294914, 0.007922421692486309, 0.001949904177034469];
+H1ElectricError =  [0.5098721095770006, 0.12175648676696989, 0.03224235083294914, 0.007922421692486309, 0.001949904177034469];
 
-MagneticError = [2.0042181007879325, 0.9781866298047875, 0.5502616339498934, 0.28069706397737304, 0.13768142439140277];
+H1MagneticError = [2.0042181007879325, 0.9781866298047875, 0.5502616339498934, 0.28069706397737304, 0.13768142439140277];
 
+LSElectricError = [0.14818729871298789, 0.04458205952586334, 0.01236690803569729, 0.003386789150707841, 0.0008478943600952674];
+
+LSMagneticError = [1.737093523457867, 0.8830857310478574, 0.5308519199985781, 0.2801388010942833, 0.1374005242633508];
 %secondtitle = 'Triangles';
 
 
 
 
 %Plotting the electric field
-
 figure(1)
-
 clf
-
-loglog(h,ElectricError,'o','LineWidth',3)
-%plot(log(h),log(ElectricError));
-
+loglog(h,H1ElectricError,'o','LineWidth',3,'color','r');
 hold on
-
-
-loglog(h,ElectricError,'LineWidth',2,'Color','k')
+loglog(h,LSElectricError,'o','LineWidth',3,'color','b');
+loglog(h,H1ElectricError,'LineWidth',2,'Color','r');
+loglog(h,LSElectricError,'LineWidth',2,'Color','b');
 set(gca,'FontSize',15)
-%loglog(h,10^(1)*h.^(1.8))
+hold on
+%Pick a basis point for the triangle
+xseed = 0.9*h(5)+h(4)*0.1;
+yseed = 0.01*0.25+0.001*.75;
+%desiredSlope Of triangle
+slope = 2;
+%Another x point
+xnext = h(4);
+
+
+b = log10(yseed/(xseed^slope));
+
+
+ynext = 10^(b)*xnext^slope;
+
+
+x = [xseed, xseed,xnext,ynext];
+%secondtitle = 'Triangles';
+
+
+
+
+%Plotting the electric field
+figure(1)
+clf
+loglog(h,H1ElectricError,'o','LineWidth',3,'color','r');
+hold on
+loglog(h,LSElectricError,'o','LineWidth',3,'color','b');
+loglog(h,H1ElectricError,'LineWidth',2,'Color','r');
+loglog(h,LSElectricError,'LineWidth',2,'Color','b');
+set(gca,'FontSize',11)
 hold on
 %Pick a basis point for the triangle
 xseed = 0.9*h(5)+h(4)*0.1;
@@ -54,8 +82,8 @@ y = [yseed, ynext, ynext, yseed];
 
 loglog(x,y,'LineWidth',2,'Color','k')
 
-text(xseed*0.7+0.3*xnext,ynext+0.003,'1','Fontsize',15)
-text(xseed-0.001,0.5*yseed+0.5*ynext,'2','Fontsize',15)
+%text(xseed*0.7+0.3*xnext,ynext+0.003,'1','Fontsize',15)
+%text(xseed-0.001,0.5*yseed+0.5*ynext,'2','Fontsize',15)
 
 
 
@@ -72,37 +100,23 @@ text(xseed-0.001,0.5*yseed+0.5*ynext,'2','Fontsize',15)
 leftaxis = 0.005;
 rightaxis = 0.13;
 upaxis = 0.65;
-downaxis = 0.0015;
+downaxis = 0;
 
 axis([leftaxis rightaxis downaxis upaxis])
-%xlabel('Mesh Size')
 
-ax = log10(leftaxis);
-bx = log10(rightaxis);
-tx = ax:(bx-ax)/10:bx;
-tx = 10.^(tx);
-ay = log10(downaxis);
-by = log10(upaxis);
-ty = ay:(by-ay)/10:by;
-ty = 10.^(ty);
-
-%ylabel('Error On Electric Field')
-
-%xticks(tx)
-%yticks(ty)
-%grid on
-
-
+legend('Alternative I','Alternative II')
 
 
 %Plotting The magnetic Field
 
 figure(2)
 clf
-loglog(h,MagneticError,'o','LineWidth',3)
+loglog(h,H1MagneticError,'o','LineWidth',3,'color','r')
 hold on
-loglog(h,MagneticError,'LineWidth',2,'Color','k')
-set(gca,'FontSize',15)
+loglog(h,LSMagneticError,'o','LineWidth',3,'color','b')
+loglog(h,H1MagneticError,'LineWidth',2,'Color','r')
+loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
+set(gca,'FontSize',11)
 
 
 hold on
@@ -128,8 +142,8 @@ y = [yseed, ynext, ynext, yseed];
 loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1','FontSize',15)
-text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','FontSize',15)
+%text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1','FontSize',15)
+%text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','FontSize',15)
 
 
 
@@ -164,7 +178,7 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-
+legend('Alternative I','Alternative II')
 
 %xticks(tx)
 %yticks(ty)
@@ -207,11 +221,12 @@ ty = 10.^(ty);
 h = [0.16666666666666666, 0.08333333333333333, 0.043478260869565216, 0.021739130434782608,...
      0.010989010989010988];%, 0.005494505494505494,0.0027548209366391185];
 
-ElectricError = [0.1505488392083424, 0.07540240822978826, 0.01964292814740662, 0.00461064875933448, 0.0010155804421071366];
+H1ElectricError = [0.1505488392083424, 0.07540240822978826, 0.01964292814740662, 0.00461064875933448, 0.0010155804421071366];
 
-MagneticError = [1.3485966107898497, 0.515270877390314, 0.22681651972361622, 0.10557908129467171, 0.05201601043760578];
+H1MagneticError = [1.3485966107898497, 0.515270877390314, 0.22681651972361622, 0.10557908129467171, 0.05201601043760578];
                                                       
-
+LSElectricError = [0.10257125554190669, 0.04721190787824579, 0.014863112248450432, 0.0036221150547460566, 0.0007750246467491926];
+LSMagneticError = [0.9331853803694574, 0.45839095006777036, 0.2045238649645601, 0.10048477597864197, 0.05047566104015773];
 %secondtitle = 'On Perturbed squares';
 
 
@@ -221,13 +236,14 @@ figure(1)
 
 clf
 
-loglog(h,ElectricError,'o','LineWidth',3)
+loglog(h,H1ElectricError,'o','LineWidth',3,'color','r')
 %plot(log(h),log(ElectricError));
 
 hold on
+loglog(h,LSElectricError,'o','LineWidth',3,'color','b')
 
-
-loglog(h,ElectricError,'LineWidth',2,'Color','k')
+loglog(h,H1ElectricError,'LineWidth',2,'Color','r')
+loglog(h,LSElectricError,'LineWidth',2,'Color','b')
 %loglog(h,10^(1)*h.^(1.8))
 hold on
 %Pick a basis point for the triangle
@@ -249,10 +265,9 @@ x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
 loglog(x,y,'r','LineWidth',2,'Color','k')
-set(gca,'FontSize',15)
-text(xseed*0.7+0.3*xnext,ynext+0.002,'1','FontSize',15)
-text(xseed-0.002,0.5*yseed+0.5*ynext,'2','FontSize',15)
-
+set(gca,'FontSize',11)
+%text(xseed*0.7+0.3*xnext,ynext+0.002,'1','FontSize',15)
+%text(xseed-0.002,0.5*yseed+0.5*ynext,'2','FontSize',15)
 
 
 
@@ -264,7 +279,7 @@ text(xseed-0.002,0.5*yseed+0.5*ynext,'2','FontSize',15)
 
 leftaxis = 0.009;
 rightaxis = 0.18;
-downaxis = 0.00091;
+downaxis = 0.0;
 upaxis = 0.16;
 
 axis([leftaxis rightaxis downaxis upaxis])
@@ -279,7 +294,7 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-
+legend('Alternative I','Alternative II')
 
 %xticks(tx)
 %yticks(ty)
@@ -296,10 +311,11 @@ ty = 10.^(ty);
 
 figure(2)
 clf
-loglog(h,MagneticError,'o','LineWidth',3)
+loglog(h,H1MagneticError,'o','LineWidth',3,'color','r')
 hold on
-loglog(h,MagneticError,'LineWidth',2,'Color','k')
-
+loglog(h,LSMagneticError,'o','LineWidth',3,'color','b')
+loglog(h,H1MagneticError,'LineWidth',2,'Color','r')
+loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
 
 
 hold on
@@ -325,10 +341,10 @@ y = [yseed, ynext, ynext, yseed];
 loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.01,'1','FontSize',15)
-text(xseed-0.0015,0.5*yseed+0.5*ynext,'1','FontSize',15)
+%text(xseed*0.7+0.3*xnext,ynext+0.01+0.01,'1','FontSize',15)
+%text(xseed-0.0015,0.5*yseed+0.5*ynext,'1','FontSize',15)
 
-set(gca,'FontSize',15)
+set(gca,'FontSize',11)
 
 
 
@@ -366,7 +382,7 @@ ty = 10.^(ty);
 %yticks(ty)
 
 
-
+legend('Alternative I','Alternative II')
 
 
 
@@ -385,11 +401,13 @@ ty = 10.^(ty);
 
 h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,0.008787156237382746];
 
-ElectricError = [0.6402171603657321, 0.2191316614798317, 0.05161479281147327, 0.013327689044599616, 0.003435073380290061];
+H1ElectricError = [0.6402171603657321, 0.2191316614798317, 0.05161479281147327, 0.013327689044599616, 0.003435073380290061];
 
-MagneticError = [3.3226284919819693, 1.6827177392771193, 0.7955836030979955, 0.3792426183789603, 0.18192650249011413];
+H1MagneticError = [3.3226284919819693, 1.6827177392771193, 0.7955836030979955, 0.3792426183789603, 0.18192650249011413];
 
+LSElectricError = [0.3682110522050534, 0.15810796882225037, 0.03953170336385856, 0.010469264282408906, 0.003850058673999911];
 
+LSMagneticError = [2.697860282739323, 1.504084831376333, 0.74567700206153, 0.36236339153342956, 0.17296289875225518];
 
 
 %secondtitle='Voronoi';
@@ -400,14 +418,11 @@ figure(1)
 
 clf
 
-loglog(h,ElectricError,'o','LineWidth',3)
-%plot(log(h),log(ElectricError));
-
+loglog(h,H1ElectricError,'o','LineWidth',3,'color','r')
 hold on
-
-
-loglog(h,ElectricError,'LineWidth',2,'Color','k')
-%loglog(h,10^(1)*h.^(1.8))
+loglog(h,LSElectricError,'o','LineWidth',3,'color','b')
+loglog(h,H1ElectricError,'LineWidth',2,'Color','r')
+loglog(h,LSElectricError,'LineWidth',2,'Color','b')
 hold on
 %Pick a basis point for the triangle
 xseed = 0.9*h(5)+h(4)*0.1;
@@ -430,9 +445,9 @@ y = [yseed, ynext, ynext, yseed];
 
 loglog(x,y,'LineWidth',2,'Color','k')
 
-text(xseed*0.7+0.3*xnext,ynext+0.001+0.0035,'1','FontSize',15)
-text(xseed-0.0012,0.5*yseed+0.5*ynext,'2','FontSize',15)
-set(gca,'FontSize',15)
+%text(xseed*0.7+0.3*xnext,ynext+0.001+0.0035,'1','FontSize',15)
+%text(xseed-0.0012,0.5*yseed+0.5*ynext,'2','FontSize',15)
+set(gca,'FontSize',11)
 
 
 
@@ -472,17 +487,18 @@ ty = 10.^(ty);
 %yticks(ty)
 %grid on
 
-
+legend('Alternative I','Alternative II')
 
 
 %Plotting The magnetic Field
 
 figure(2)
 clf
-loglog(h,MagneticError,'o','LineWidth',3)
+loglog(h,H1MagneticError,'o','LineWidth',3,'color','r')
 hold on
-loglog(h,MagneticError,'LineWidth',2,'Color','k')
-
+loglog(h,LSMagneticError,'o','LineWidth',3,'color','b')
+loglog(h,H1MagneticError,'LineWidth',2,'Color','r')
+loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
 
 
 hold on
@@ -511,13 +527,13 @@ y = [yseed, ynext, ynext, yseed];
 loglog(x,y,'LineWidth',2,'Color','k')
 
 
-text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01+0.01,'1','FontSize',15)
-text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','fontSize',15)
+%text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01+0.01,'1','FontSize',15)
+%text(xseed-0.0015/1.5,0.5*yseed+0.5*ynext,'1','fontSize',15)
 
 
 
 
-set(gca,'FontSize',15)
+set(gca,'FontSize',11)
 
 
 
@@ -550,50 +566,9 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-
-
 %xticks(tx)
 %yticks(ty)
 
 %grid on
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+legend('Alternative I','Alternative II')
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
