@@ -770,7 +770,12 @@ def LeastSquaresLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     MJ = MV.dot(MJ)
     return ME,MV,MJ,Edges
 
-
+def psi3(x,y):
+    return 1-x-y
+def psi2(x,y):
+    return y
+def psi1(x,y):
+    return x
 def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #This routine will compute the local mass matrix in the edge-based space E
     #Here we must ensure that the orientation of the elements is such that
@@ -800,131 +805,135 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
 
     OrVert,OrEdg = StandardElement(Element,EdgeNodes,Nodes,Ori)
     ElNodes      = OrVert[0:n]    
-    ElEdges      = OrEdg[0:n]
+    #ElEdges      = OrEdg[0:n]
 
-    A            = np.eye(n+1)
-    for i in range(n+1):
-        A[n,i] = 1/n
-    print(A)
-    H            = np.zeros(n+1)
-    for i in range(n+1):
-        for j in range(n+1):
-            
-   # H      = np.zeros((3,3))
-   # H[0,0] = A
-            
-   # for i in range(n):
-   #     x1         = Vertices[i][0]
-   #     y1         = Vertices[i][1]
-   #     x2         = Vertices[i+1][0]
-   #     y2         = Vertices[i+1][1]
-        
-  #      lengthedge  = math.sqrt((x2-x1)**2+(y2-y1)**2)
-  #      taux        = (x2-x1)/lengthedge
-  #      tauy        = (y2-y1)/lengthedge
+    H            = np.zeros((n+1,n+1))
+    xstar        = 0
+    ystar        = 0
+    for node in ElNodes:
+        xstar = xstar+node[0]
+        ystar = ystar+node[1]
+    xstar = xstar/n
+    ystar = ystar/n
+    #We will map each triangle to the standard triangle with vertices at
+    #(0,0), (1,0) and (0,1). We will always map v* to (0,0), 
+    #the leftmost point (in the list) will be mapped to (1,0) while
+    #the remaining point will be mapped to (0,1)
+    #in the write-up this translates to
 
-    #     h           = lengthedge/3
-    #     nx          = tauy
-    #     ny          = -taux
-    #     costheta    = (x2-x1)/lengthedge
-    #     sintheta    = (y2-y1)/lengthedge
-        
-    #     xot         = x1+h*costheta
-    #     yot         = y1+h*sintheta
-        
-    #     xtt         = x1+2*h*costheta
-    #     ytt         = y1+2*h*sintheta
-        
-    #     H[1,1]      = H[1,1] + h*nx*( m2(x1,y1,xP,yP)**3+\
-    #                              3*m2(xot,yot,xP,yP)**3+\
-    #                              3*m2(xtt,ytt,xP,yP)**3+\
-    #                                m2(x2,y2,xP,yP)**3 )/8  
+    #v <--> xstar,ystar <---> (0,0) <---> Psi3
+    #w <--> xn,yn       <---> (1,0) <---> Psi1
+    #z <--> xnp1,ynp1   <---> (0,1) <---> Psi2
+    for i in range(n):
+        noden   = OrVert[i]
+        xn      = noden[0]
+        yn      = noden[1]
 
-    #     H[2,2]      = H[2,2] + h*nx*( m3(x1,y1,xP,yP)**3+\
-    #                              3*m3(xot,yot,xP,yP)**3+\
-    #                              3*m3(xtt,ytt,xP,yP)**3+\
-    #                                m3(x2,y2,xP,yP)**3 )/8       
-   
+        nodenp1 = OrVert[i+1]
+        xnp1    = nodenp1[0]
+        ynp1    = nodenp1[1]
 
-    #     H[1,2]      = H[1,2] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
-    #                                3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
-    #                                3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
-    #                                  m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
+        #Tn      = (1/6)*( 1/( (xn-xstar)*(ynp1-ystar)-(yn-ystar)*(xnp1-xstar) ) )
+        Tn      = (1/6)*( (xn-xstar)*(ynp1-ystar)-(yn-ystar)*(xnp1-xstar)  )
 
-    #     H[2,1]      = H[2,1] + 3*h*nx*( m3(x1,y1,xP,yP)*m2(x1,y1,xP,yP)**2+\
-    #                                3*m3(xot,yot,xP,yP)*m2(xot,yot,xP,yP)**2+\
-    #                                3*m3(xtt,ytt,xP,yP)*m2(xtt,ytt,xP,yP)**2+\
-    #                                  m3(x2,y2,xP,yP)*m2(x2,y2,xP,yP)**2 )/16
+        if i == n-1:
+            #LeftmostNode
+            H[i,i]   = (psi1(0,0.5)**2+psi1(0.5,0)**2+psi1(0.5,0.5)**2)*Tn + H[i,i] #Integrated against itself
+            H[i,0]   = (psi1(0,0.5)*psi2(0,0.5)+psi1(0.5,0)*psi2(0.5,0)+psi1(0.5,0.5)*psi2(0.5,0.5))*Tn + H[i,0] #against the rightmost
+            H[i,n]   = (psi1(0,0.5)*psi3(0,0.5)+psi1(0.5,0)*psi3(0.5,0)+psi1(0.5,0.5)*psi3(0.5,0.5))*Tn + H[i,n] #against v*
 
-  
-       
-    # D      = np.ones((n,3))
+            #Rightmostnode   
+            H[0,i]   = H[i,0] #Against the leftmost
+            H[0,0]   = (psi2(0,0.5)**2+psi2(0.5,0)**2+psi2(0.5,0.5)**2)*Tn + H[0,0] #Agaist itself
+            H[0,n]   = (psi2(0,0.5)*psi3(0,0.5)+psi2(0.5,0)*psi3(0.5,0)+psi2(0.5,0.5)*psi3(0.5,0.5))*Tn + H[0,n] #against v*
 
-    # D[:,1] = [m2(x,y,xP,yP) for [x,y] in ElNodes]    
-    # D[:,2] = [m3(x,y,xP,yP) for [x,y] in ElNodes]
+            #v* node
+            H[n,i]   = H[i,n] #Against the leftmost
+            H[n,0]   = H[0,n] #Against the rightmost
+            H[n,n]   = (psi3(0,0.5)**2+psi3(0.5,0)**2+psi3(0.5,0.5)**2)*Tn + H[n,n] #Against itself
+        else:
+            #LeftmostNode
+            H[i,i]   = (psi1(0,0.5)**2+psi1(0.5,0)**2+psi1(0.5,0.5)**2)*Tn + H[i,i] #Integrated agaist itself
+            H[i,i+1] = (psi1(0,0.5)*psi2(0,0.5)+psi1(0.5,0)*psi2(0.5,0)+psi1(0.5,0.5)*psi2(0.5,0.5))*Tn + H[i,i+1] #against the rightmost
+            H[i,n]   = (psi1(0,0.5)*psi3(0,0.5)+psi1(0.5,0)*psi3(0.5,0)+psi1(0.5,0.5)*psi3(0.5,0.5))*Tn + H[i,n] #against v*
 
-    # Pistar = np.linalg.inv(np.transpose(D).dot(D)).dot(np.transpose(D))
-    # Pi     = D.dot(Pistar)
-    # Id     = np.identity(n)
-    # MV     = np.transpose(Pistar).dot(H.dot(Pistar))+A*np.transpose(Id-Pi).dot(Id-Pi)    
-   
-    # NJ = np.zeros((Dim,n))
+            #Rightmostnode   
+            H[i+1,i]   = H[i,i+1] #Against the leftmost
+            H[i+1,i+1] = (psi2(0,0.5)**2+psi2(0.5,0)**2+psi2(0.5,0.5)**2)*Tn + H[i+1,i+1] #Agaist itself
+            H[i+1,n]   = (psi2(0,0.5)*psi3(0,0.5)+psi2(0.5,0)*psi3(0.5,0)+psi2(0.5,0.5)*psi3(0.5,0.5))*Tn + H[i+1,n] #agaist v*
+
+            #v* node
+            H[n,i]   = H[i,n] #Against the leftmost
+            H[n,i+1] = H[i+1,n] #Agaist the rightmost
+            H[n,n]   = (psi3(0,0.5)**2+psi3(0.5,0)**2+psi3(0.5,0.5)**2)*Tn + H[n,n] #Agaist itself
+    #I  = np.eye(n+1)
+    #B            = np.eye(n+1)
+    #for i in range(n+1):
+    #    B[n,i] = 1/n
+    B  = np.zeros((n+1,n))
+    for i in range(n):
+        B[i,i] = 1
+        B[n,i] = 1/n
+
+    MV = np.transpose(B).dot(H.dot(B))#+A*np.transpose(I-B).dot(I-B)
+    
+    NJ = np.zeros((Dim,n))
     
     
-    # for i in range(Dim):        
-    #     NJ[i,:] = np.transpose( LocprojE(Basis[i],Element,EdgeNodes,Nodes) )
+    for i in range(Dim):        
+        NJ[i,:] = np.transpose( LocprojE(Basis[i],Element,EdgeNodes,Nodes) )
     
     
-    # NJ = np.transpose(NJ)
-    # #print(NJ)
-    # b = np.transpose(NJ).dot(ME)
-    # #print(b)
-    # #print(ME)
-    # #print(NJ)
-    # #print(np.transpose(NJ).dot(ME).dot(NJ))
-    # #print(np.linalg.inv( np.transpose(NJ).dot(ME).dot(NJ) ) )
+    NJ = np.transpose(NJ)
+    #print(NJ)
+    b = np.transpose(NJ).dot(ME)
+    #print(b)
+    #print(ME)
+    #print(NJ)
+    #print(np.transpose(NJ).dot(ME).dot(NJ))
+    #print(np.linalg.inv( np.transpose(NJ).dot(ME).dot(NJ) ) )
     
-    # MJ = np.linalg.pinv( np.transpose(NJ).dot(ME).dot(NJ) )
-    # #print(MJ)
-    # MJ = MJ.dot(b)
-    # #print(MJ)
+    MJ = np.linalg.pinv( np.transpose(NJ).dot(ME).dot(NJ) )
+    #print(MJ)
+    MJ = MJ.dot(b)
+    #print(MJ)
 
 
 
     
-    # PolyCoordinates = np.zeros((2*(len(Vertices)-1),Dim))
-    # JMatrix = np.zeros( (len(Vertices)-1,2*(len(Vertices)-1)) ) 
+    PolyCoordinates = np.zeros((2*(len(Vertices)-1),Dim))
+    JMatrix = np.zeros( (len(Vertices)-1,2*(len(Vertices)-1)) ) 
                        
-    # l = 0
-    # k = 0
-    # for Polynomial in Basis:
+    l = 0
+    k = 0
+    for Polynomial in Basis:
         
         
-    #     for j in range(len(Vertices)-1):
-    #         Vertex = Vertices[j]
-    #         x = Vertex[0]
-    #         y = Vertex[1]
+        for j in range(len(Vertices)-1):
+            Vertex = Vertices[j]
+            x = Vertex[0]
+            y = Vertex[1]
             
-    #         Px,Py = Polynomial(x,y)
+            Px,Py = Polynomial(x,y)
             
-    #         PolyCoordinates[2*j,l] = Px
-    #         PolyCoordinates[2*j+1,l] = Py
+            PolyCoordinates[2*j,l] = Px
+            PolyCoordinates[2*j+1,l] = Py
             
             
     
-    #         if k==0:
-    #             Jx,Jy = J(x,y)
-    #             JMatrix[j,2*j] = -Jy
-    #             JMatrix[j,2*j+1] = Jx
+            if k==0:
+                Jx,Jy = J(x,y)
+                JMatrix[j,2*j] = -Jy
+                JMatrix[j,2*j+1] = Jx
                 
-    #         j = j+1
-    #     k = 1        
-    #     l = l+1
+            j = j+1
+        k = 1        
+        l = l+1
     
-    # MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
-    # MJ = MV.dot(MJ)
-    #return ME,MV,MJ,Edges
-    return 1
+    MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
+    MJ = MV.dot(MJ)
+    return ME,MV,MJ,Edges
+
 def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
     
@@ -1044,7 +1053,65 @@ def LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     MJ = MJ.tocsr()
     
     return ME,MV,MJ
-
+def PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
+    #This routine takes a mesh and assembles the global mass matrices and their inverses
+    
+    
+    NumberElements = len(ElementEdges)
+    NumberEdges = len(EdgeNodes)
+    NumberNodes = len(Nodes)
+    
+    
+    ME = lil_matrix((NumberEdges,NumberEdges))
+    #ME = np.zeros((NumberEdges,NumberEdges))
+    #WE=np.zeros((NumberEdges,NumberEdges))
+    MV = lil_matrix((NumberNodes,NumberNodes))
+    #MV = np.zeros((NumberNodes,NumberNodes))
+    #WV=np.zeros((NumberNodes,NumberNodes))
+    MJ = lil_matrix((NumberNodes,NumberEdges))
+    #MJ = np.zeros((NumberNodes,NumberEdges))
+    
+    #loop over the elements
+    k = 0
+    for Element in ElementEdges: 
+        #Compute the local mass and stiffness matrices
+        #LocME,LocWE,LocMV,LocWV,Edges=LocalMEWEMVWV(Element,EdgeNodes,Nodes) 
+        Ori = Orientations[k]
+        k = k+1
+        LocME,LocMV,LocMJ,Edges = PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori) 
+        
+        #The assembly of the edge-based functions is easier since Element
+        #Contains the order in which the edges ought to be assembled
+       
+        for j in range(len(Element)):
+            ME[Element[j],Element] = ME[Element[j],Element] + LocME[j]
+            #WE[Element[j],Element] = WE[Element[j],Element] + LocWE[j]
+        n=len(Edges)-1
+        ElementVertices = [0]*n
+        
+        for i in range(n):
+            ElementVertices[i] = Edges[i][0]
+         
+        for j in range(len(Element)):
+            MV[ElementVertices[j],ElementVertices] = MV[ElementVertices[j],ElementVertices]+LocMV[j]
+            MJ[ElementVertices[j],Element] = MJ[ElementVertices[j],Element]+LocMJ[j]
+            #WV[ElementVertices[j],ElementVertices]=WV[ElementVertices[j],ElementVertices]+LocWV[j]
+        
+        #print(MJ)
+        #i = 0
+        #print(np.linalg.norm(LocMJ))
+        #for Edge in Element:
+        #    MJ[Edge,ElementVertices] = MJ[Edge,ElementVertices]+LocMJ[i]
+        #    i = i+1
+        #for j in range(len(Element)):
+            #MJ[ElementVertices[j],Element] = MJ[ElementVertices[j],Element]+LocMJ[j]
+    #return ME,WE,MV,WV
+    
+    ME = ME.tocsr()
+    MV = MV.tocsr()
+    MJ = MJ.tocsr()
+    
+    return ME,MV,MJ
 #Interpolators 
 
 def projV(func,Nodes):
@@ -1336,6 +1403,107 @@ def LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orient
     time = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
     ME,MV,MJ = LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    
+    #Let us construct the required matrices
+    
+    curl = primcurl(EdgeNodes,Nodes) #the primary curl
+    #D = np.zeros((len(Nodes),len(Nodes))) #this matrix will is explained in the pdf
+    D = lil_matrix((len(Nodes),len(Nodes)))
+    for i in InternalNodes:
+        D[i,i]=1
+    D = D.tocsr()
+   
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = D.dot(Aprime)
+    #A = np.zeros((NumberInternalNodes,NumberInternalNodes))
+    A = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+    
+
+    for i in range(NumberInternalNodes):
+        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+    A = A.tocsr()
+    
+    b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+    b = D.dot(b)
+    
+    #Bh = projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder3projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder5projE(InitialCond,EdgeNodes,Nodes)
+    Bh = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+    Bh = np.transpose(Bh)[0]
+  
+    Eh = np.zeros(len(Nodes))
+    
+    
+    EhInterior = np.zeros(len(Nodes)) #This is Eh in the interior
+    
+    EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
+   
+    
+    
+    for t in time:
+        
+        #We update the time dependant boundary conditions
+        #i.e. The boundary values of the electric field
+        for NodeNumber in BoundaryNodes:
+            Node = Nodes[NodeNumber]
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        
+        #Solve  for the internal values of the electric field
+        
+        W1 = b.dot(Bh)
+        W2 = Aprime.dot(EhBoundary)
+        
+        #EhInterior[InternalNodes] = np.linalg.solve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        #EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #f = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #EhInterior[InternalNodes] = f
+        
+        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        Eh = EhInterior+EhBoundary
+        
+        
+        #Update the magnetic field
+        Bh = Bh-dt*curl.dot(Eh) 
+           
+        
+    #Now we compute the error
+    def ContB(x,y):
+        return ExactB(x,y,T)
+    def ContE(x,y):
+        return ExactE(x,y,T-(1-theta)*dt)
+    
+    Bex = projE(ContB,EdgeNodes,Nodes)
+    Eex = projV(ContE,Nodes)
+    
+    Bex = np.transpose(Bex)[0]
+    Eex = np.transpose(Eex)[0]
+    
+    B = Bh-Bex
+    E = Eh-Eex
+    #MagneticError = np.transpose(B).dot(ME).dot(B)
+    #ElectricError = np.transpose(E).dot(MV).dot(E)
+    
+    MagneticError = ME.dot(B).dot(B)
+    ElectricError = MV.dot(E).dot(E)
+    
+    #MagneticError = math.sqrt(MagneticError[0,0])
+    #ElectricError = math.sqrt(ElectricError[0,0])
+    
+    MagneticError = math.sqrt(MagneticError)
+    ElectricError = math.sqrt(ElectricError)
+    
+    return Bh,Eh,MagneticError,ElectricError
+
+def PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+    #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
+    #the given time.
+    #The boundary conditions are given above 
+    time = np.arange(0,T,dt)
+    InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     
     #Let us construct the required matrices
     

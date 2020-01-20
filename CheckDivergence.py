@@ -37,9 +37,13 @@ for Pfile in ProcessedFiles:
    #print('Retrieved The Mesh')
    #Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
    #                                BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta)
-   Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+   #Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+   #    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
+   #        ExactE,ExactB,T,dt,theta)
+
+   Bh,Eh,Berror,Eerror = PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
        BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
-           ExactE,ExactB,T,dt,theta)
+           ExactE,ExactB,T,dt,theta)        
    #VisualizeE(Eh,Nodes)
    TriangleElectricErr[i] = Eerror
    TriangleMagneticErr[i] = Berror
@@ -85,7 +89,10 @@ for Pfile in ProcessedFiles:
    #Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
    #                                BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta)
 
-   Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+   #Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+   #    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
+   #        ExactE,ExactB,T,dt,theta)
+   Bh,Eh,Berror,Eerror = PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
        BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
            ExactE,ExactB,T,dt,theta)
    #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
@@ -135,8 +142,11 @@ for Pfile in ProcessedFiles:
     DivMat                                                  = primdiv(ElementEdges,EdgeNodes,Nodes,Orientations)
     #Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
     #                                BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta)
-    Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
-                        BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
+    #Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+    #                    BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
+    #       ExactE,ExactB,T,dt,theta)
+    Bh,Eh,Berror,Eerror = PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+       BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
            ExactE,ExactB,T,dt,theta)
     #Bh,Eh,Berror,Eerror=Solver(Nodes,EdgeNodes,ElementEdges,BoundaryNodes,\
     #                           EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt)
