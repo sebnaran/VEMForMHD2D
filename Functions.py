@@ -608,9 +608,7 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
             
             PolyCoordinates[2*j,l] = Px
             PolyCoordinates[2*j+1,l] = Py
-            
-            
-    
+
             if k==0:
                 Jx,Jy = J(x,y)
                 JMatrix[j,2*j] = -Jy
@@ -873,7 +871,7 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     B  = np.zeros((n+1,n))
     for i in range(n):
         B[i,i] = 1
-        B[n,i] = 1/n
+        B[n,i] = 2*(i+1)/(n*(n+1))
 
     MV = np.transpose(B).dot(H.dot(B))#+A*np.transpose(I-B).dot(I-B)
     
@@ -932,7 +930,7 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     
     MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
     MJ = MV.dot(MJ)
-    return ME,MV,MJ,Edges
+    return ME,MV,MJ,Edges,B
 
 def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
