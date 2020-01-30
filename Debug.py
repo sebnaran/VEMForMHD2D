@@ -30,16 +30,25 @@ from Functions import *
 # # Ar               = np.array([1,1,1,1])
 # # print(Ar.dot(MV.dot(Ar)))
 # print(B)
-places = [1,2]
-with open('listofplaces.txt','w') as file:
-    file.writelines('[')
-    for e in range(len(places)):
-        if e == 0:
-            file.writelines(str(places[e]))
-        else:
-            file.writelines(',')
-            file.writelines(str(places[e]))
+# places = [1,2]
+# with open('listofplaces.txt','w') as file:
+#     file.writelines('[')
+#     for e in range(len(places)):
+#         if e == 0:
+#             file.writelines(str(places[e]))
+#         else:
+#             file.writelines(',')
+#             file.writelines(str(places[e]))
         
-    file.writelines('];')
-    file.write('\n')
-    
+#     file.writelines('];')
+#     file.write('\n')
+ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.0345033.txt','PVh=0.0174767.txt',\
+                  'PVh=0.0087872.txt']
+
+h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,\
+     0.008787156237382746]
+for Pfile in ProcessedFiles:
+
+    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)
+    l = math.sqrt(1/len(ElementEdges))
+    print(l)

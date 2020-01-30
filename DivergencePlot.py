@@ -14,7 +14,7 @@ from Functions import *
 
 theta          = 0.5
 ProcessedFiles = ['PTh=0.051886.txt','PertPQh=0.043478.txt','PVh=0.0677285.txt']
-h = [0.051886,0.043478,0.677285]
+h = [0.051886,0.043478,0.0677285]
 Basis = [Poly1,Poly2,Poly]
 T     = 20
 y     = 0
@@ -27,8 +27,11 @@ for Pfile in ProcessedFiles:
 
     time   = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
-    ME,MV,MJ = NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    #ME,MV,MJ = NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    #ME,MV,MJ = LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
+    ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
     
+    print('Piecewise Matrices Assembled')
 
     #Let us construct the required matrices   
     curl = primcurl(EdgeNodes,Nodes) #the primary curl

@@ -865,13 +865,13 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
             H[n,i+1] = H[i+1,n] #Agaist the rightmost
             H[n,n]   = (psi3(0,0.5)**2+psi3(0.5,0)**2+psi3(0.5,0.5)**2)*Tn + H[n,n] #Agaist itself
     #I  = np.eye(n+1)
-    #B            = np.eye(n+1)
-    #for i in range(n+1):
-    #    B[n,i] = 1/n
-    B  = np.zeros((n+1,n))
-    for i in range(n):
-        B[i,i] = 1
-        B[n,i] = 2*(i+1)/(n*(n+1))
+    B            = np.eye(n+1)
+    for i in range(n+1):
+        B[n,i] = 1/n
+    #B  = np.zeros((n+1,n))
+    #for i in range(n):
+    #    B[i,i] = 1
+    #    B[n,i] = 2*(i+1)/(n*(n+1))
 
     MV = np.transpose(B).dot(H.dot(B))#+A*np.transpose(I-B).dot(I-B)
     
@@ -930,7 +930,7 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     
     MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
     MJ = MV.dot(MJ)
-    return ME,MV,MJ,Edges,B
+    return ME,MV,MJ,Edges
 
 def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
