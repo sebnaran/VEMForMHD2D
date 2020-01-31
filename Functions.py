@@ -142,13 +142,13 @@ def GetMesh(file):
                                                     
 
     Nodes=Nodes+']'
-    EdgeNodes=EdgeNodes+']'
-    Elements=Elements+']' #add the last ]
-    Nodes=eval(Nodes)
-    EdgeNodes=eval(EdgeNodes)# turn string to list
-    Elements=eval(Elements)
-    EdgeNodes=[(np.array(y)-1).tolist() for y in EdgeNodes]
-    Elements=[(np.array(y)-1).tolist() for y in Elements]
+    EdgeNodes = EdgeNodes+']'
+    Elements  = Elements+']' #add the last ]
+    Nodes     = eval(Nodes)
+    EdgeNodes = eval(EdgeNodes)# turn string to list
+    Elements  = eval(Elements)
+    EdgeNodes = [(np.array(y)-1).tolist() for y in EdgeNodes]
+    Elements  = [(np.array(y)-1).tolist() for y in Elements]
     #EdgeNodes=np.array(EdgeNodes)-1
     #Elements=np.array(Elements)-1 #subtract one from each position in the array(lists in mathematica begin with 1)
     return Nodes,EdgeNodes,Elements
@@ -240,11 +240,9 @@ def FindVertecesEdges(Nodes,EdgeNodes):
     return VertecesEdges
 
 
-
-
 def ProcessedMesh(Pfile):
     with open(Pfile, "rb") as fp:   # Unpickling
-        N,E,EE,B,O= pickle.load(fp)
+        N,E,EE,B,O = pickle.load(fp)
     return N,E,EE,B,O
 
 

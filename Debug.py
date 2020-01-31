@@ -42,13 +42,14 @@ from Functions import *
         
 #     file.writelines('];')
 #     file.write('\n')
-ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.0345033.txt','PVh=0.0174767.txt',\
-                  'PVh=0.0087872.txt']
+x = [1,2,3,4]
+y = [32,4,6]
+with open('love.txt', "wb") as fp:
+    pickle.dump((x,y),fp)
+    #pickle.dump(y,fp)
 
-h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,\
-     0.008787156237382746]
-for Pfile in ProcessedFiles:
+with open('love.txt',"rb") as fb:
+    a,s = pickle.load(fb)
 
-    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)
-    l = math.sqrt(1/len(ElementEdges))
-    print(l)
+print(a)
+print(s)
