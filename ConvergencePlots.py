@@ -23,13 +23,13 @@ for task in Tasks:
 
     #h = [0.10101525445522107, 0.05018856132284956, 0.025141822757713456, 0.012525468249897755,\
     #      0.006261260829309998]
-    ProcessedFiles = ['PTh=0.00313997.txt','PTh=0.00156773.txt']
-    h              = [0.00313997,0.00156773]
+    ProcessedFiles = ['PVh=0.00442309.txt','PVh=0.00221383.txt']
+    h              = [0.00442309,0.00221383]
     Basis = [Poly1,Poly2,Poly]
     T     = 0.25
-    TriangleElectricErr = [0]*len(ProcessedFiles)
-    TriangleMagneticErr = [0]*len(ProcessedFiles)
-    DivTriangleErr      = [0]*len(ProcessedFiles)
+    VoronoiElectricErr = [0]*len(ProcessedFiles)
+    VoronoiMagneticErr = [0]*len(ProcessedFiles)
+    #DivTriangleErr      = [0]*len(ProcessedFiles)
     i                   = 0
     for Pfile in ProcessedFiles:
         dt = 0.05*h[i]**2
@@ -51,8 +51,8 @@ for task in Tasks:
             BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
                 ExactE,ExactB,T,dt,theta)        
         #VisualizeE(Eh,Nodes)
-        TriangleElectricErr[i] = Eerror
-        TriangleMagneticErr[i] = Berror
+        VoronoiElectricErr[i] = Eerror
+        VoronoiMagneticErr[i] = Berror
         
         #    divB                         = DivMat.dot(Bh)
         #    DivErr                       = 0
@@ -65,7 +65,8 @@ for task in Tasks:
         #    #DivErr                    = math.sqrt(DivErr)
         #    DivTriangleErr[i] = DivErr
         i = i+1
-
+        with open('Vornoi'+task+'.txt', "wb") as fp:
+            pickle.dump((VoronoiElectricErr,VoronoiMagneticErr),fp)
 
     print('Triangle Electric = '+str(TriangleElectricErr))
     print('Triangle Magnetic = '+str(TriangleMagneticErr))
@@ -119,7 +120,8 @@ for task in Tasks:
         #    #DivErr            = math.sqrt(DivErr)
         #    DivQuadErr[i] = DivErr
         i = i+1
-
+        with open('Quad'+task+'.txt', "wb") as fp:
+            pickle.dump((QuadElectricErr,QuadMagneticErr),fp)
     print('Quad Electric = '+str(QuadElectricErr))
     print('Quad Magnetic = '+str(QuadMagneticErr))
     print('Quad Divergence err ='+str(DivQuadErr))
@@ -130,14 +132,14 @@ for task in Tasks:
 
     #h = [0.12803687993289598, 0.06772854614785964, 0.03450327796711771, 0.017476749542968805,\
     #    0.008787156237382746]
-    ProcessedFiles = ['PVh=0.00442309.txt','PVh=0.00221383.txt']
-    h              = [0.00442309,0.00221383]
 
+    ProcessedFiles = ['PTh=0.00313997.txt','PTh=0.00156773.txt']
+    h              = [0.00313997,0.00156773]
     Basis                    = [Poly1,Poly2,Poly]
     T                        = 0.25
 
-    VoronoiElectricErr = [0]*len(ProcessedFiles)
-    VoronoiMagneticErr = [0]*len(ProcessedFiles)
+    TriangleElectricErr = [0]*len(ProcessedFiles)
+    TriangleMagneticErr = [0]*len(ProcessedFiles)
     DivVoronoiErr      = [0]*len(ProcessedFiles)
     i                  = 0
     for Pfile in ProcessedFiles:
@@ -159,8 +161,8 @@ for task in Tasks:
                 ExactE,ExactB,T,dt,theta)  
         print('Computed Numerical Solution')
         #VisualizeE(Eh,Nodes)
-        VoronoiElectricErr[i] = Eerror
-        VoronoiMagneticErr[i] = Berror
+        TriangleElectricErr[i] = Eerror
+        TriangleMagneticErr[i] = Berror
         # divB                         = DivMat.dot(Bh)
         # DivErr                       = 0
         # NEl                          = len(ElementEdges)
@@ -172,7 +174,8 @@ for task in Tasks:
         # #DivErr            = math.sqrt(DivErr)
         # DivVoronoiErr[i] = DivErr
         i=i+1
-
+        with open('Triangle'+task+'.txt', "wb") as fp:
+            pickle.dump((TriangleElectricErr,TriangleMagneticErr),fp)
     #with open('FiveEMVoronoi.txt', "wb") as fp:   #Pickling
     #    pickle.dump([FiveVoronoiElectricError,FiveVoronoiMagneticError], fp)
 
