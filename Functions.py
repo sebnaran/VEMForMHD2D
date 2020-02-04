@@ -18,10 +18,15 @@ from scipy.sparse.linalg import spsolve
 #B_t=-curl E
 #E=-nu curl B
 
-def DiffusionCoeff(x,y):
+def Conductivity(x,y):
     #This is the diffusion coefficient
     #this function is scalar valued
+    #Example 1
     return 1
+    #Example 2
+    #num = 50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150
+    #den = 50*(math.exp(y)-math.exp(y))+(x**2+y**2)*(math.cos(x*y)+math.sin(x*y))
+    #return 2*(num)/(den)
 
 def EssentialBoundaryCond(x,y,t):
     #These are the essecial boundary conditions
@@ -31,9 +36,10 @@ def EssentialBoundaryCond(x,y,t):
     #return math.exp(t+x)-math.exp(t+y)#+math.exp(t) #Solution 4 includes J cross B term
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t) #Solution 4 Includes J cross B term
     #return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
+    #example 1
     return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
-
-
+    #Example 2
+    #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
 
 def InitialCond(x,y):
     #These are the initial condition on the magnetic field
@@ -50,10 +56,14 @@ def InitialCond(x,y):
 #    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
 #    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
 #    return Bx,By #Solution 6 includes JxB
+    #Example 1
     Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
     By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    return Bx,By #Solution 6 includes JxB
-
+    return Bx,By 
+    #example 2
+    #Bx = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
+    #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
+    #return Bx,By
 
 
 def ExactB(x,y,t):
@@ -64,10 +74,13 @@ def ExactB(x,y,t):
     #return math.exp(y+t),0 #Solution #3 it includes J cross B term
     #return math.exp(t+y),math.exp(t+x) #Solution#4  includes J cross B term
     #return 20*math.exp(y+t)+x*math.exp(t),20*math.exp(x+t)-y*math.exp(t)#Solution 5 Includes J cross B term
-    
+    #Example 1
     Bx = ( 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y) )*math.exp(-t)
     By = ( 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y) )*math.exp(-t)
     return Bx,By#Solution 6 includes JxB
+    #Example2
+    #Bx,By = InitialCond(x,y)
+    #return Bx*math.exp(-t),By*math.exp(-t)
 
 def ExactE(x,y,t):
     #This is the exact Electric field
@@ -77,7 +90,11 @@ def ExactE(x,y,t):
     #return math.exp(t+x)-math.exp(t+y)+math.exp(t) #Solution 4 Includes J cross B term
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t)#Solution 5 Includes J cross B term
 #   return ( 50*( math.exp(x)-math.exp(y) )+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 6 includes JxB
-    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)   
+    #Example 1
+    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
+    #Example 2 
+    #Elec = EssentialBoundaryCond(x,y,t) 
+    #return Elec
 
 def J(x,y):
     #return 0,0 #for solutions that do not inclide J x B
@@ -89,11 +106,17 @@ def J(x,y):
 #    Jx = ( (x**2+y**2+1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
 #    Jy = -( (x**2+y**2+1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
 #    return Jx,Jy #Solution 6 includes JxB
+    #Example 1
     Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
     Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
     return Jx,Jy #Solution 6 includes JxB
+    #Example2, recall that due to how the code is written J = -u
+    #num1 = 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150
+    #dem1 = 50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
+    #num2 =-num1
+    #dem2 = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
 
-
+    #return num1/(2*dem1),num2/(2*dem2)
 
 def Poly1(x,y):
     return 1,0
@@ -131,14 +154,14 @@ def Poly(x,y):
 def GetMesh(file):
     #This function will, provided a text file in the format of meshes in Mathematica,
     #return the coordinates of the nodes, the Edge Nodes and the Nodes of each element
-    UnprocessedMesh=open(file).read()
-    FirstCut=UnprocessedMesh.split('}}')
-    Nodes=FirstCut[0]+'}'
-    EdgeNodes,Elements,trash=FirstCut[1].split(']}')
+    UnprocessedMesh = open(file).read()
+    FirstCut        = UnprocessedMesh.split('}}')
+    Nodes           = FirstCut[0]+'}'
+    EdgeNodes,Elements,trash = FirstCut[1].split(']}')
     for rep in (('{','['),('}',']'),('*^','*10**'),('Line[',''),('Polygon[',''),(']]',']')):
-        Nodes=Nodes.replace(rep[0],rep[1])
-        EdgeNodes=EdgeNodes.replace(rep[0],rep[1])  #Replace the characters in the first position of the
-        Elements=Elements.replace(rep[0],rep[1])     #parenthesis with the second character
+        Nodes     = Nodes.replace(rep[0],rep[1])
+        EdgeNodes = EdgeNodes.replace(rep[0],rep[1])  #Replace the characters in the first position of the
+        Elements  = Elements.replace(rep[0],rep[1])     #parenthesis with the second character
                                                     
 
     Nodes=Nodes+']'
@@ -244,12 +267,6 @@ def ProcessedMesh(Pfile):
     with open(Pfile, "rb") as fp:   # Unpickling
         N,E,EE,B,O = pickle.load(fp)
     return N,E,EE,B,O
-
-
-
-
-
-
 
 
 
@@ -471,7 +488,6 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     n                      = len(Element)
     Dim                    = len(Basis)
     xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
-    nu                     = DiffusionCoeff(xP,yP)
     NE                     = np.zeros((n,2))
     RE                     = np.zeros((n,2))
     
@@ -564,7 +580,7 @@ def NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     Pi     = D.dot(Pistar)
     Id     = np.identity(n)
     MV     = np.transpose(Pistar).dot(H.dot(Pistar))+A*np.transpose(Id-Pi).dot(Id-Pi)    
-   
+    MV     = MV*Conductivity(xP,yP)
     NJ = np.zeros((Dim,n))
     
     
@@ -627,7 +643,7 @@ def LeastSquaresLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     n                      = len(Element)
     Dim                    = len(Basis)
     xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
-    nu                     = DiffusionCoeff(xP,yP)
+    
     NE                     = np.zeros((n,2))
     RE                     = np.zeros((n,2))
     
@@ -779,7 +795,7 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     n                      = len(Element)
     Dim                    = len(Basis)
     xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
-    nu                     = DiffusionCoeff(xP,yP)
+    
     NE                     = np.zeros((n,2))
     RE                     = np.zeros((n,2))
     
@@ -863,13 +879,14 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
             H[n,i+1] = H[i+1,n] #Agaist the rightmost
             H[n,n]   = (psi3(0,0.5)**2+psi3(0.5,0)**2+psi3(0.5,0.5)**2)*Tn + H[n,n] #Agaist itself
     #I  = np.eye(n+1)
-    B            = np.eye(n+1)
-    for i in range(n+1):
+    #B            = np.eye(n+1)
+    #for i in range(n+1):
+    #    B[n,i] = 1/n
+    B  = np.zeros((n+1,n))
+    for i in range(n):
+        B[i,i] = 1
         B[n,i] = 1/n
-    #B  = np.zeros((n+1,n))
-    #for i in range(n):
-    #    B[i,i] = 1
-    #    B[n,i] = 2*(i+1)/(n*(n+1))
+        #B[n,i] = 2*(i+1)/(n*(n+1))
 
     MV = np.transpose(B).dot(H.dot(B))#+A*np.transpose(I-B).dot(I-B)
     
