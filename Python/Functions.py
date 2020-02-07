@@ -947,13 +947,13 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     MJ = MV.dot(MJ)
     return ME,MV,MJ,Edges
 
-def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
+def EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
-    
+    Basis          = [Poly1,Poly2,Poly]
     
     NumberElements = len(ElementEdges)
-    NumberEdges = len(EdgeNodes)
-    NumberNodes = len(Nodes)
+    NumberEdges    = len(EdgeNodes)
+    NumberNodes    = len(Nodes)
     
     
     ME = lil_matrix((NumberEdges,NumberEdges))
@@ -1007,10 +1007,10 @@ def NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     
     return ME,MV,MJ
 
-def LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
+def LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
     
-    
+    Basis  = [Poly1,Poly2,Poly]
     NumberElements = len(ElementEdges)
     NumberEdges = len(EdgeNodes)
     NumberNodes = len(Nodes)
@@ -1066,10 +1066,10 @@ def LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
     MJ = MJ.tocsr()
     
     return ME,MV,MJ
-def PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations):
+def GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
     
-    
+    Basis  = [Poly1,Poly2,Poly]
     NumberElements = len(ElementEdges)
     NumberEdges = len(EdgeNodes)
     NumberNodes = len(Nodes)

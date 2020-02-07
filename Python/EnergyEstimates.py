@@ -16,7 +16,6 @@ from Functions import *
 #Theta = [0.5,1]
 Tasks  = ['H1']
 Thetas = [0.5]
-Basis  = [Poly1,Poly2,Poly]
 #Final time
 T     = 0.5
 #Test Q's
@@ -39,63 +38,63 @@ for task in Tasks:
         
 
         if task == 'H1':
-            ME,MV,MJ = NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+            ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
         elif task == 'LS':
-            ME,MV,MJ = LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
-        elif task == 'PW':
-            ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
+            ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+        elif task == 'GI':
+            ME,MV,MJ = GIAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
 
         #We prepare the necessary matrices to set up the linear systen.
-        curl = primcurl(EdgeNodes,Nodes)
-        D    = lil_matrix((len(Nodes),len(Nodes)))
-        for i in InternalNodes:
-            D[i,i]=1
-        D = D.tocsr()
+        # curl = primcurl(EdgeNodes,Nodes)
+        # D    = lil_matrix((len(Nodes),len(Nodes)))
+        # for i in InternalNodes:
+        #     D[i,i]=1
+        # D = D.tocsr()
 
-        Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
-        Aprime = D.dot(Aprime)
-        A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+        # Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+        # Aprime = D.dot(Aprime)
+        # A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
         
-        for i in range(NumberInternalNodes):
-            A[i,:] = Aprime[InternalNodes[i],InternalNodes]
-        A = A.tocsr()
+        # for i in range(NumberInternalNodes):
+        #     A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+        # A = A.tocsr()
     
-        b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
-        b = D.dot(b)
+        # b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+        # b = D.dot(b)
 
-        Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
-        Bh   = np.transpose(Bh)[0]
-        RHS1 = Bh.dot(ME.dot(Bh))
+        # Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+        # Bh   = np.transpose(Bh)[0]
+        # RHS1 = Bh.dot(ME.dot(Bh))
 
-        Eh         = np.zeros(len(Nodes))
-        EhInterior = np.zeros(len(Nodes))
-        EhBoundary = np.zeros(len(Nodes))
-        step       = 1
-        for t in time[0:len(time)-1]:
+        # Eh         = np.zeros(len(Nodes))
+        # EhInterior = np.zeros(len(Nodes))
+        # EhBoundary = np.zeros(len(Nodes))
+        # step       = 1
+        # for t in time[0:len(time)-1]:
 
-            for NodeNumber in BoundaryNodes:
-                Node = Nodes[NodeNumber]
-                EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        #     for NodeNumber in BoundaryNodes:
+        #         Node = Nodes[NodeNumber]
+        #         EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
 
-            RHS2 = RHS2+\
-                   (beta**step)*gamma*dt*\
-                   ( EhBoundary.dot(MV.dot(EhBoundary))+\
-                   (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
+        #     RHS2 = RHS2+\
+        #            (beta**step)*gamma*dt*\
+        #            ( EhBoundary.dot(MV.dot(EhBoundary))+\
+        #            (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
 
-            W1 = b.dot(Bh)
-            W2 = Aprime.dot(EhBoundary)
+        #     W1 = b.dot(Bh)
+        #     W2 = Aprime.dot(EhBoundary)
 
-            EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
+        #     EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
 
-            Eh   = EhInterior+EhBoundary
-            LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
+        #     Eh   = EhInterior+EhBoundary
+        #     LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
 
-            Bh   = Bh-dt*curl.dot(Eh)
-            LHS1 = (beta**step)*Bh.dot(ME.dot(Bh))
+        #     Bh   = Bh-dt*curl.dot(Eh)
+        #     LHS1 = (beta**step)*Bh.dot(ME.dot(Bh))
 
-            LHS[step] = LHS1+LHS2
-            RHS[step] = RHS1+RHS2
-            step      = step+1
+        #     LHS[step] = LHS1+LHS2
+        #     RHS[step] = RHS1+RHS2
+        #     step      = step+1
 
 #         print('recording results')
 #         if y == 0:
