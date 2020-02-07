@@ -10,39 +10,26 @@ import pickle
 from scipy.sparse import csr_matrix
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
+from EnergyClass import Energy
 from Functions import *
 
-#Tasks = ['PW','H1','LS']
-#Theta = [0.5,1]
-Tasks  = ['H1']
-Thetas = [0.5]
-#Final time
-T     = 0.5
-#Test Q's
-Q     = range(1,10,0.1)
-#ProcessedFiles = ['PTh=0.051886.txt','PertPQh=0.043478.txt','PVh=0.0677285.txt']
-ProcessedFiles = ['PTh=0.051886.txt']
-#h = [0.051886,0.043478,0.0677285]
-h = [0.0677285]
+Tasks          = ['GI','E','LS']
+ProcessedFiles = ['PTh=0.051886.txt','PertPQh=0.043478.txt','PVh=0.0677285.txt']
+hs             = [0.051886,0.043478,0.0677285]
 
-for task in Tasks:
-    print(task)
-    FileCounter = 0
-    for Pfile in ProcessedFiles:
-        print(Pfile)
-        dt           = h[FileCounter]
-        FileCounter= = FileCounter+1
-        time  = np.arange(0,T,dt)
-        
-        Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
-        
+task  = Tasks[0]
+FNum  = 1
+Pfile = ProcessedFiles[FNum]
+h     = hs[FNum]
 
-        if task == 'H1':
-            ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
-        elif task == 'LS':
-            ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
-        elif task == 'GI':
-            ME,MV,MJ = GIAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
+Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
+
+if task == 'H1':
+    ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+elif task == 'LS':
+    ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+elif task == 'GI':
+    ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
 
         #We prepare the necessary matrices to set up the linear systen.
         # curl = primcurl(EdgeNodes,Nodes)
