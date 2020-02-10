@@ -12,6 +12,7 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from Functions import *
 
+ExactB(x,y,t)
 # Basis = [Poly1,Poly2,Poly]
 # ProcessedFiles = ['PVh=0.128037.txt','PVh=0.0677285.txt','PVh=0.0345033.txt','PVh=0.0174767.txt',\
 #                  'PVh=0.0087872.txt']

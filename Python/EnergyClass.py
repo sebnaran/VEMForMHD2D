@@ -1,61 +1,40 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Energy(object):
 
-    def __init__(self,MV,ME,MJ):
-
-        self.iMV  = MV
-        self.iME  = ME
-        self.iMJ  = MJ
+    def __init__(self,theta,dt,N,L1,L2,R1,R2):
+        self.Np1    = N  #This is should be equal to N+1 where N is the last step taken in the time integration
+        self.itheta = theta
+        self.idt    = dt
+        self.iL1    = L1
+        self.iL2    = L2 
+        self.iR1    = R1 
+        self.iR2    = R2
     
-    def ComputeCoeffs(self,theta,dt,T):
-        curl = primcurl(EdgeNodes,Nodes)
-        D    = lil_matrix((len(Nodes),len(Nodes)))
-        for i in InternalNodes:
-            D[i,i]=1
-        D = D.tocsr()
-
-        Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
-        Aprime = D.dot(Aprime)
-        A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+    def SearchQ(self):
         
-        for i in range(NumberInternalNodes):
-            A[i,:] = Aprime[InternalNodes[i],InternalNodes]
-        A = A.tocsr()
-    
-        b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
-        b = D.dot(b)
+        Qs = np.arange(0,1/self.itheta,0.01)
+        F  = Qs*0
+        step = 0
+        for Q in Qs:
+            beta  = (1-Q*self.itheta)/(1+Q*(1-self.itheta))
+            gamma = 1/(1-Q*self.itheta)
+            LHS = 0
+            RHS = 0
+            for n in range(self.Np1-1):
+                Ei = self.iL2[n] 
+                Eb = self.iR2[n]
 
-        Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
-        Bh   = np.transpose(Bh)[0]
-        RHS1 = Bh.dot(ME.dot(Bh))
+                LHS = beta**(n)*Ei + LHS
+                RHS = beta**(n)*Eb + RHS
 
-        Eh         = np.zeros(len(Nodes))
-        EhInterior = np.zeros(len(Nodes))
-        EhBoundary = np.zeros(len(Nodes))
-        step       = 1
-        for t in time[0:len(time)-1]:
+            LHS = 0.5*LHS*gamma*self.idt
+            RHS = RHS*gamma*self.idt
+        
+            F[step] = self.iR1+RHS-LHS-(self.iL1)*beta**(self.Np1)
+            step    = step+1
 
-            for NodeNumber in BoundaryNodes:
-                Node = Nodes[NodeNumber]
-                EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
-
-            RHS2 = RHS2+\
-                   (beta**step)*gamma*dt*\
-                   ( EhBoundary.dot(MV.dot(EhBoundary))+\
-                   (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
-
-            W1 = b.dot(Bh)
-            W2 = Aprime.dot(EhBoundary)
-
-            EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
-
-            Eh   = EhInterior+EhBoundary
-            LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
-
-            Bh   = Bh-dt*curl.dot(Eh)
-            LHS1 = (beta**step)*Bh.dot(ME.dot(Bh))
-
-            LHS[step] = LHS1+LHS2
-            RHS[step] = RHS1+RHS2
-            step      = step+1
+        print(F)
+        plt.plot(Qs,F)
+        plt.show()

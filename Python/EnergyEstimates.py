@@ -12,76 +12,76 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from EnergyClass import Energy
 from Functions import *
-
+Thetas         = [0.5,1]
 Tasks          = ['GI','E','LS']
 ProcessedFiles = ['PTh=0.051886.txt','PertPQh=0.043478.txt','PVh=0.0677285.txt']
 hs             = [0.051886,0.043478,0.0677285]
 
-task  = Tasks[0]
-FNum  = 1
+theta = Thetas[0]
+task  = Tasks[1]
+FNum  = 2
 Pfile = ProcessedFiles[FNum]
 h     = hs[FNum]
+dt    = 0.05*h
+En0    = SetEnergy(0.5,dt,theta,Pfile,task)
+#En1    = SetEnergy(0.5,dt,0.75,Pfile,task)
+#En2    = SetEnergy(0.5,dt,1,Pfile,task)
+En0.SearchQ()
+#En1.SearchQ()
+#En2.SearchQ()
 
-Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
 
-if task == 'H1':
-    ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
-elif task == 'LS':
-    ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
-elif task == 'GI':
-    ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+#We prepare the necessary matrices to set up the linear systen.
+#curl = primcurl(EdgeNodes,Nodes)
+# D    = lil_matrix((len(Nodes),len(Nodes)))
+# for i in InternalNodes:
+#     D[i,i]=1
+# D = D.tocsr()
 
-        #We prepare the necessary matrices to set up the linear systen.
-        # curl = primcurl(EdgeNodes,Nodes)
-        # D    = lil_matrix((len(Nodes),len(Nodes)))
-        # for i in InternalNodes:
-        #     D[i,i]=1
-        # D = D.tocsr()
+# Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+# Aprime = D.dot(Aprime)
+# A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
 
-        # Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
-        # Aprime = D.dot(Aprime)
-        # A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
-        
-        # for i in range(NumberInternalNodes):
-        #     A[i,:] = Aprime[InternalNodes[i],InternalNodes]
-        # A = A.tocsr()
-    
-        # b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
-        # b = D.dot(b)
+# for i in range(NumberInternalNodes):
+#     A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+# A = A.tocsr()
 
-        # Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
-        # Bh   = np.transpose(Bh)[0]
-        # RHS1 = Bh.dot(ME.dot(Bh))
+# b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+# b = D.dot(b)
 
-        # Eh         = np.zeros(len(Nodes))
-        # EhInterior = np.zeros(len(Nodes))
-        # EhBoundary = np.zeros(len(Nodes))
-        # step       = 1
-        # for t in time[0:len(time)-1]:
+# Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+# Bh   = np.transpose(Bh)[0]
+# RHS1 = Bh.dot(ME.dot(Bh))
 
-        #     for NodeNumber in BoundaryNodes:
-        #         Node = Nodes[NodeNumber]
-        #         EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+# Eh         = np.zeros(len(Nodes))
+# EhInterior = np.zeros(len(Nodes))
+# EhBoundary = np.zeros(len(Nodes))
+# step       = 1
+# for t in time[0:len(time)-1]:
 
-        #     RHS2 = RHS2+\
-        #            (beta**step)*gamma*dt*\
-        #            ( EhBoundary.dot(MV.dot(EhBoundary))+\
-        #            (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
+#     for NodeNumber in BoundaryNodes:
+#         Node = Nodes[NodeNumber]
+#         EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
 
-        #     W1 = b.dot(Bh)
-        #     W2 = Aprime.dot(EhBoundary)
+#     RHS2 = RHS2+\
+#            (beta**step)*gamma*dt*\
+#            ( EhBoundary.dot(MV.dot(EhBoundary))+\
+#            (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
 
-        #     EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
+#     W1 = b.dot(Bh)
+#     W2 = Aprime.dot(EhBoundary)
 
-        #     Eh   = EhInterior+EhBoundary
-        #     LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
+#     EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
 
-        #     Bh   = Bh-dt*curl.dot(Eh)
-        #     LHS1 = (beta**step)*Bh.dot(ME.dot(Bh))
+#     Eh   = EhInterior+EhBoundary
+#     LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
 
-        #     LHS[step] = LHS1+LHS2
-        #     RHS[step] = RHS1+RHS2
-        #     step      = step+1
+#     Bh   = Bh-dt*curl.dot(Eh)
+#     LHS1 = (beta**step)*Bh.dot(ME.dot(Bh))
+
+#     LHS[step] = LHS1+LHS2
+#     RHS[step] = RHS1+RHS2
+#     step      = step+1
 
 #         print('recording results')
 #         if y == 0:

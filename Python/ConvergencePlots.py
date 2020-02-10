@@ -40,10 +40,10 @@ for task in Tasks:
         #DivMat                                                  = primdiv(ElementEdges,EdgeNodes,Nodes,Orientations)
         #print('Retrieved The Mesh')
         if task == 'H1':
-            Bh,Eh,Berror,Eerror = NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+            Bh,Eh,Berror,Eerror = ESolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
                                         BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta)
         if task == 'LS':
-            Bh,Eh,Berror,Eerror = LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
+            Bh,Eh,Berror,Eerror = LSSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,\
             BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
                 ExactE,ExactB,T,dt,theta)
         if task == 'PW':

@@ -10,6 +10,7 @@ import pickle
 from scipy.sparse import csr_matrix
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
+from EnergyClass import Energy
 
 #Data 
 #Here the forcing diffusion coefficient, forcing terms, initial conditions, Dirichlet and Neumann conditions of the
@@ -109,7 +110,7 @@ def J(x,y):
     #Example 1
     Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
     Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
-    return Jx,Jy #Solution 6 includes JxB
+    return Jx,Jy 
     #Example2, recall that due to how the code is written J = -u
     #num1 = 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150
     #dem1 = 50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
@@ -1307,13 +1308,13 @@ def primdiv(ElementEdges,EdgeNodes,Nodes,Orientations):
 #Solver
 
 
-def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
     #the given time.
     #The boundary conditions are given above 
     time = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
-    ME,MV,MJ = NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     
     
     #Let us construct the required matrices
@@ -1387,7 +1388,7 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
     def ContE(x,y):
         return ExactE(x,y,T-(1-theta)*dt)
     
-    Bex = projE(ContB,EdgeNodes,Nodes)
+    Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
     Eex = projV(ContE,Nodes)
     
     Bex = np.transpose(Bex)[0]
@@ -1409,13 +1410,13 @@ def NewSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Es
     
     return Bh,Eh,MagneticError,ElectricError
 
-def LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+def LSSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
     #the given time.
     #The boundary conditions are given above 
     time = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
-    ME,MV,MJ = LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     
     #Let us construct the required matrices
     
@@ -1488,7 +1489,7 @@ def LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orient
     def ContE(x,y):
         return ExactE(x,y,T-(1-theta)*dt)
     
-    Bex = projE(ContB,EdgeNodes,Nodes)
+    Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
     Eex = projV(ContE,Nodes)
     
     Bex = np.transpose(Bex)[0]
@@ -1510,13 +1511,13 @@ def LeastSquaresSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orient
     
     return Bh,Eh,MagneticError,ElectricError
 
-def PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
     #the given time.
     #The boundary conditions are given above 
     time = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
-    ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     
     #Let us construct the required matrices
     
@@ -1589,7 +1590,7 @@ def PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientati
     def ContE(x,y):
         return ExactE(x,y,T-(1-theta)*dt)
     
-    Bex = projE(ContB,EdgeNodes,Nodes)
+    Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
     Eex = projV(ContE,Nodes)
     
     Bex = np.transpose(Bex)[0]
@@ -1610,3 +1611,83 @@ def PiecewiseSolver(J,Basis,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientati
     ElectricError = math.sqrt(ElectricError)
     
     return Bh,Eh,MagneticError,ElectricError
+
+
+
+def SetEnergy(T,dt,theta,Pfile,task):
+    #In this function we will compute and save the norms of the electric, magnetic fields
+    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
+    InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    if task == 'E':
+        ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    elif task == 'LS':
+        ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+    elif task == 'GI':
+        ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+    
+    time = np.arange(0,T,dt)
+    N    = len(time)
+
+    curl = primcurl(EdgeNodes,Nodes)
+    D    = lil_matrix((len(Nodes),len(Nodes)))
+    for i in InternalNodes:
+        D[i,i] = 1
+    D = D.tocsr()
+
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = D.dot(Aprime)
+    A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+
+    for i in range(NumberInternalNodes):
+        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+    A = A.tocsr()
+
+    b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+    b = D.dot(b)
+
+    Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+    Bh   = np.transpose(Bh)[0]
+    R1   = Bh.dot(ME.dot(Bh))
+
+    Eh         = np.zeros(len(Nodes))
+    EhInterior = np.zeros(len(Nodes))
+    EhBoundary = np.zeros(len(Nodes))
+    
+    L2         = np.arange(0,N-1)*0
+    R2         = np.arange(0,N-1)*0
+    step       = 0
+    for t in time:
+
+        for NodeNumber in BoundaryNodes:
+            Node = Nodes[NodeNumber]
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        
+        
+        # RHS2 = RHS2+\
+        #        (beta**step)*gamma*dt*\
+        #        ( EhBoundary.dot(MV.dot(EhBoundary))+\
+        #        (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
+
+        W1 = b.dot(Bh)
+        W2 = Aprime.dot(EhBoundary)
+
+        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
+
+        Eh = EhInterior+EhBoundary
+        #LHS2 = LHS2+0.5*gamma*dt(beta**(step))*Eh.dot(MV.dot(Eh))
+
+        Bh = Bh-dt*curl.dot(Eh)
+
+        if step == N-1:
+            L1 =  Bh.dot(ME.dot(Bh))
+        else:
+
+            R2[step] = ( EhBoundary.dot(MV.dot(EhBoundary))+\
+                       (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
+
+            L2[step] = EhInterior.dot(MV.dot(EhInterior))
+
+        step = step+1
+
+    En = Energy(theta,dt,N,L1,L2,R1,R2)
+    return En
