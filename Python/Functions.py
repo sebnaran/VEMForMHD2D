@@ -11,6 +11,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 from EnergyClass import Energy
+import matplotlib.pyplot as plt
 
 #Data 
 #Here the forcing diffusion coefficient, forcing terms, initial conditions, Dirichlet and Neumann conditions of the
@@ -36,12 +37,13 @@ def EssentialBoundaryCond(x,y,t):
     #return -math.exp(y+t) #Solution #3 it includes J cross B term
     #return math.exp(t+x)-math.exp(t+y)#+math.exp(t) #Solution 4 includes J cross B term
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t) #Solution 4 Includes J cross B term
-    #return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
+    return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
     #example 1
-    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
+    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
     #Example 2
     #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
-
+    #Energy Plots
+    #return math.sin(x+y)*math.exp(t)
 def InitialCond(x,y):
     #These are the initial condition on the magnetic field
     #r must be a 2 dimensional array
@@ -54,18 +56,21 @@ def InitialCond(x,y):
     #return math.exp(y),math.exp(x) #Solution#4  includes J cross B term
     #return 20*math.exp(y)+x,20*math.exp(x)-y#Solution 5 Includes J cross B term
     
-#    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
-#    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-#    return Bx,By #Solution 6 includes JxB
-    #Example 1
     Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
     By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    return Bx,By 
+    return Bx,By #Solution 6 includes JxB
+    #Example 1
+    # Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
+    # By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
+    # return Bx,By 
     #example 2
     #Bx = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
     #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
     #return Bx,By
-
+    #EnergyExample
+    #Bx = math.exp(x)*math.sin(y+1)
+    #By = math.exp(y)*math.cos(x+1)
+    #return Bx,By
 
 def ExactB(x,y,t):
     #This is the exact Magnetic field
@@ -1691,3 +1696,93 @@ def SetEnergy(T,dt,theta,Pfile,task):
 
     En = Energy(theta,dt,N,L1,L2,R1,R2)
     return En
+
+def EnergyPlot(Q,T,dt,theta,Pfile,task):
+    #In this function we will compute and save the norms of the electric, magnetic fields
+    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
+    InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    if task == 'E':
+        ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    elif task == 'LS':
+        ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+    elif task == 'GI':
+        ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
+    
+    time = np.arange(0,T,dt)
+    N    = len(time)
+
+    curl = primcurl(EdgeNodes,Nodes)
+    D    = lil_matrix((len(Nodes),len(Nodes)))
+    for i in InternalNodes:
+        D[i,i] = 1
+    D = D.tocsr()
+
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = D.dot(Aprime)
+    A      = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+
+    for i in range(NumberInternalNodes):
+        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+    A = A.tocsr()
+
+    b = np.transpose(curl).dot(ME)+MJ
+    b = D.dot(b)
+
+    Bh   = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+    Bh   = np.transpose(Bh)[0]
+
+    Eh         = np.zeros(len(Nodes))
+    EhInterior = np.zeros(len(Nodes))
+    EhBoundary = np.zeros(len(Nodes))
+    
+    beta  = (1-Q*theta)/(1+Q*(1-theta))
+    gamma = 1/(1-Q*theta)
+    step  = 1
+    R1    = Bh.dot(ME.dot(Bh))
+    L1    = 0
+    R2    = 0
+    L2    = 0  
+    F     = time*0
+    R     = time*0 
+    L     = time*0
+    print(beta)
+    print(gamma) 
+    for t in time[0:N-1]:
+
+        for NodeNumber in BoundaryNodes:
+            Node = Nodes[NodeNumber]
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        
+        
+        R2 = R2+\
+                (beta**step)*gamma*dt*\
+                ( EhBoundary.dot(MV.dot(EhBoundary))+\
+                (curl.dot(EhBoundary)).dot(ME.dot(curl.dot(EhBoundary))) )
+
+        W1 = b.dot(Bh)
+        W2 = Aprime.dot(EhBoundary)
+
+        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes])
+        
+        L2 = L2+0.5*gamma*dt*(beta**(step))*EhInterior.dot(MV.dot(EhInterior))
+        Eh = EhInterior+EhBoundary
+        
+
+        Bh      = Bh-dt*curl.dot(Eh)
+        L1      = (beta**step)*Bh.dot(ME.dot(Bh))
+        #print(R2)
+        #print(L2)
+        #print(L1)
+        F[step] = R2+R1-L2-L1
+        R[step] = R2+R1
+        L[step] = L2+L1
+        step    = step+1
+    #print(F)
+    # for i in range(10):
+    #     print(L[i])
+    fig, (ax1, ax2,ax3) = plt.subplots(3, sharex=True)
+    ax1.plot(time, R)
+    ax2.plot(time, L)
+    ax3.plot(time, F)
+    plt.show()
+    

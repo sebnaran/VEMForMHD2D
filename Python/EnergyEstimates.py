@@ -14,7 +14,9 @@ from EnergyClass import Energy
 from Functions import *
 Thetas         = [0.5,1]
 Tasks          = ['GI','E','LS']
-ProcessedFiles = ['PTh=0.051886.txt','PertPQh=0.043478.txt','PVh=0.0677285.txt']
+ProcessedFiles = ['PTh=0.051886.txt',\
+                  'PertPQh=0.043478.txt',\
+                  'PVh=0.0677285.txt']
 hs             = [0.051886,0.043478,0.0677285]
 
 theta = Thetas[0]
@@ -22,16 +24,18 @@ task  = Tasks[1]
 FNum  = 2
 Pfile = ProcessedFiles[FNum]
 h     = hs[FNum]
-dt    = 0.05*h
-En0    = SetEnergy(0.5,dt,theta,Pfile,task)
+dt    = 0.005*h
+#En0    = SetEnergy(0.5,dt,theta,Pfile,task)
 #En1    = SetEnergy(0.5,dt,0.75,Pfile,task)
 #En2    = SetEnergy(0.5,dt,1,Pfile,task)
-En0.SearchQ()
+#En0.SearchQ()
 #En1.SearchQ()
 #En2.SearchQ()
+Q = 0.5
+T = 10
+EnergyPlot(Q,T,dt,theta,Pfile,task)
 
-
-#We prepare the necessary matrices to set up the linear systen.
+#We prepare the necessary matrices to set up the linear system.
 #curl = primcurl(EdgeNodes,Nodes)
 # D    = lil_matrix((len(Nodes),len(Nodes)))
 # for i in InternalNodes:
