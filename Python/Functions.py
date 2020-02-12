@@ -866,13 +866,9 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #ElEdges      = OrEdg[0:n]
 
     H            = np.zeros((n+1,n+1))
-    xstar        = 0
-    ystar        = 0
-    for node in ElNodes:
-        xstar = xstar+node[0]
-        ystar = ystar+node[1]
-    xstar = xstar/n
-    ystar = ystar/n
+    xstar        = xP
+    ystar        = yP
+
     #We will map each triangle to the standard triangle with vertices at
     #(0,0), (1,0) and (0,1). We will always map v* to (0,0), 
     #the leftmost point (in the list) will be mapped to (1,0) while
@@ -928,10 +924,11 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #B            = np.eye(n+1)
     #for i in range(n+1):
     #    B[n,i] = 1/n
-    B  = np.zeros((n+1,n))
+    w,Areas = convexcoeffs(Element,EdgeNodes,Nodes,Ori)
+    B       = np.zeros((n+1,n))
     for i in range(n):
         B[i,i] = 1
-        B[n,i] = 1/n
+        B[n,i] = w[i]
         #B[n,i] = 2*(i+1)/(n*(n+1))
 
     MV = np.transpose(B).dot(H.dot(B))#+A*np.transpose(I-B).dot(I-B)
