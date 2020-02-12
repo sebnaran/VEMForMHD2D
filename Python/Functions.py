@@ -794,6 +794,46 @@ def psi2(x,y):
     return y
 def psi1(x,y):
     return x
+
+def convexcoeffs(Element,EdgeNodes,Nodes,Ori):
+    n                      = len(Element)
+    OrVert,OrEdg           = StandardElement(Element,EdgeNodes,Nodes,Ori)
+    xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
+
+    ElNodes  = OrVert[0:n] 
+    xs       = 0
+    ys       = 0
+    for node in ElNodes:
+        xs = xs+node[0]
+        ys = ys+node[1]
+    
+    xs = xs/n
+    ys = ys/n
+    Areas = [0]*n
+    #2*Area = Ax(By - Cy) + Bx(Cy - Ay) + Cx(Ay - By)
+    #A=starred B = kth C=k+1th
+    xk         = ElNodes[n-1][0]
+    yk         = ElNodes[n-1][1]
+    xkp1       = ElNodes[0][0]
+    ykp1       = ElNodes[0][1]
+    Areas[n-1] = abs(xs*(yk-ykp1)+xk*(ykp1-ys)+xkp1*(ys-yk))/2
+    for i in range(n-1):
+        xk       = ElNodes[i][0]
+        yk       = ElNodes[i][1]
+        xkp1     = ElNodes[i+1][0]
+        ykp1     = ElNodes[i+1][1]
+        Areas[i] = abs(xs*(yk-ykp1)+xk*(ykp1-ys)+xkp1*(ys-yk))/2
+    w    = [0]*n
+    w[0] = ( (n+1)*(Areas[0]+Areas[n-1])+sum(Areas[1:n-1]) )/(3*n*A)
+    
+    for i in range(1,n):
+        A1         = Areas[0:i-1]
+        A2         = Areas[i+1:n]
+        s          = sum(A1)
+        p          = sum(A2)
+        w[i] = ( (n+1)*(Areas[i]+Areas[i-1])+s+p )/(3*n*A)
+
+    return w, Areas
 def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     #This routine will compute the local mass matrix in the edge-based space E
     #Here we must ensure that the orientation of the elements is such that
@@ -1784,5 +1824,4 @@ def EnergyPlot(Q,T,dt,theta,Pfile,task):
     ax1.plot(time, R)
     ax2.plot(time, L)
     ax3.plot(time, F)
-    plt.show()
-    
+    plt.show()    
