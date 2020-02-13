@@ -64,9 +64,10 @@ for task in Tasks:
         #    #DivErr                    = math.sqrt(DivErr)
         #    DivTriangleErr[i] = DivErr
         i = i+1
-        #with open('Vornoi'+task+'.txt', "wb") as fp:
-        #    pickle.dump((VoronoiElectricErr,VoronoiMagneticErr),fp)
-
+    
+    
+    with open('Vornoi'+task+'.txt', "wb") as fp:
+        pickle.dump((VoronoiElectricErr,VoronoiMagneticErr),fp)
     print('Voronoi Electric = '+str(VoronoiElectricErr))
     print('Voronoi Magnetic = '+str(VoronoiMagneticErr))
     #print('Voronoi Divergence err ='+str(DivTriangleErr))
@@ -119,8 +120,8 @@ for task in Tasks:
         #    #DivErr            = math.sqrt(DivErr)
         #    DivQuadErr[i] = DivErr
         i = i+1
-        #with open('Quad'+task+'.txt', "wb") as fp:
-        #    pickle.dump((QuadElectricErr,QuadMagneticErr),fp)
+    with open('Quad'+task+'.txt', "wb") as fp:
+        pickle.dump((QuadElectricErr,QuadMagneticErr),fp)
     print('Quad Electric = '+str(QuadElectricErr))
     print('Quad Magnetic = '+str(QuadMagneticErr))
     #print('Quad Divergence err ='+str(DivQuadErr))
@@ -174,8 +175,8 @@ for task in Tasks:
         # #DivErr            = math.sqrt(DivErr)
         # DivVoronoiErr[i] = DivErr
         i=i+1
-        with open('Triangle'+task+'.txt', "wb") as fp:
-            pickle.dump((TriangleElectricErr,TriangleMagneticErr),fp)
+    with open('Triangle'+task+'.txt', "wb") as fp:
+        pickle.dump((TriangleElectricErr,TriangleMagneticErr),fp)
     #with open('FiveEMVoronoi.txt', "wb") as fp:   #Pickling
     #    pickle.dump([FiveVoronoiElectricError,FiveVoronoiMagneticError], fp)
 
