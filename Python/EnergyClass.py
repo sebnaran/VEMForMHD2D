@@ -20,8 +20,8 @@ class Energy(object):
         for Q in Qs:
             beta  = (1-Q*self.itheta)/(1+Q*(1-self.itheta))
             gamma = 1/(1-Q*self.itheta)
-            LHS = 0
-            RHS = 0
+            LHS   = 0
+            RHS   = 0
             for n in range(self.Np1-1):
                 Ei = self.iL2[n] 
                 Eb = self.iR2[n]
@@ -33,8 +33,7 @@ class Energy(object):
             RHS = RHS*gamma*self.idt
         
             F[step] = self.iR1+RHS-LHS-(self.iL1)*beta**(self.Np1)
+            F[step] = F[step]/self.iR1
             step    = step+1
 
-        print(F)
-        plt.plot(Qs,F)
-        plt.show()
+        return F

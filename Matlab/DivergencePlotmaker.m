@@ -1,5 +1,6 @@
 clear all
 
+
 H1QuadSimulations
 H1TrigSimulations
 H1VoronoiSimulations
