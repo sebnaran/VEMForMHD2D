@@ -37,9 +37,9 @@ def EssentialBoundaryCond(x,y,t):
     #return -math.exp(y+t) #Solution #3 it includes J cross B term
     #return math.exp(t+x)-math.exp(t+y)#+math.exp(t) #Solution 4 includes J cross B term
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t) #Solution 4 Includes J cross B term
-    return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
+    #return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
     #example 1
-    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
+    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
     #Example 2
     #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
     #Energy Plots
@@ -57,13 +57,13 @@ def InitialCond(x,y):
     #return math.exp(y),math.exp(x) #Solution#4  includes J cross B term
     #return 20*math.exp(y)+x,20*math.exp(x)-y#Solution 5 Includes J cross B term
     
-    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
-    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    return Bx,By #Solution 6 includes JxB
-    #Example 1
     #Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
     #By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    #return Bx,By 
+    #return Bx,By #Solution 6 includes JxB
+    #Example 1
+    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
+    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
+    return Bx,By 
     #example 2
     #Bx = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
     #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
@@ -1442,8 +1442,8 @@ def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialB
     #MagneticError = np.transpose(B).dot(ME).dot(B)
     #ElectricError = np.transpose(E).dot(MV).dot(E)
     
-    MagneticError = ME.dot(B).dot(B)
-    ElectricError = MV.dot(E).dot(E)
+    MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
+    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
     
     #MagneticError = math.sqrt(MagneticError[0,0])
     #ElectricError = math.sqrt(ElectricError[0,0])
@@ -1543,8 +1543,8 @@ def LSSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     #MagneticError = np.transpose(B).dot(ME).dot(B)
     #ElectricError = np.transpose(E).dot(MV).dot(E)
     
-    MagneticError = ME.dot(B).dot(B)
-    ElectricError = MV.dot(E).dot(E)
+    MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
+    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
     
     #MagneticError = math.sqrt(MagneticError[0,0])
     #ElectricError = math.sqrt(ElectricError[0,0])
@@ -1644,8 +1644,8 @@ def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     #MagneticError = np.transpose(B).dot(ME).dot(B)
     #ElectricError = np.transpose(E).dot(MV).dot(E)
     
-    MagneticError = ME.dot(B).dot(B)
-    ElectricError = MV.dot(E).dot(E)
+    MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
+    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
     
     #MagneticError = math.sqrt(MagneticError[0,0])
     #ElectricError = math.sqrt(ElectricError[0,0])
