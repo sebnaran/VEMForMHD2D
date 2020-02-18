@@ -1,6 +1,6 @@
-shape = 'quads';
+%shape = 'quads';
 %shape = 'triangles';
-%shape = 'voronoi';
+shape = 'voronoi';
 
 switch shape
     case 'triangles'
@@ -17,15 +17,16 @@ LSElectricError = [0.14818729871298789, 0.04458205952586334, 0.01236690803569729
 
 LSMagneticError = [1.737093523457867, 0.8830857310478574, 0.5308519199985781, 0.2801388010942833, 0.1374005242633508];
 
-PiecewiseElectric = [0.15617332183125077, 0.04720367855318061, 0.013734498731550082, 0.003706965600792301, 0.0009266598253482083];
+%PiecewiseElectric = [0.15617332183125077, 0.04720367855318061, 0.013734498731550082, 0.003706965600792301, 0.0009266598253482083];
 
-PiecewiseMagnetic = [1.7257613098011293, 0.8821623227726677, 0.5308026621064391, 0.2800706220693727, 0.13739725521090834];
+%PiecewiseMagnetic = [1.7257613098011293, 0.8821623227726677, 0.5308026621064391, 0.2800706220693727, 0.13739725521090834];
 %New trial.
 %PiecewiseElectric = [0.15565380780196314, 0.06619434712739114, 0.016493843607543232, 0.004374138191195906, 0.0010836239662052856];
 %PiecewiseMagnetic = [1.5431901128336851, 0.9569453749129787, 0.541891998918303, 0.28335839603304325, 0.14036938458439813];
 %secondtitle = 'Triangles';
-
-
+%Using the centroid
+PiecewiseElectric = [0.15617332183123447, 0.047203678553183685, 0.013734498731569515, 0.003706965600802786, 0.0009266598253584832];
+PiecewiseMagnetic = [1.632657414334451, 0.8685300411286138, 0.5292523226138253, 0.2798912912511224, 0.13737942008748644];
 set(gca,'FontSize',15)
 hold on
 %Pick a basis point for the triangle
@@ -60,7 +61,8 @@ loglog(h,H1ElectricError,'LineWidth',2,'Color','k');
 loglog(h,LSElectricError,'LineWidth',2,'Color','b');
 loglog(h,PiecewiseElectric,'Linewidth',2,'Color','r');
 
-set(gca,'FontSize',11)
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 hold on
 %Pick a basis point for the triangle
 xseed = 0.9*h(5)+h(4)*0.1;
@@ -104,8 +106,8 @@ downaxis = 0;
 
 axis([leftaxis rightaxis downaxis upaxis])
 
-legend('Alternative I','Alternative II', 'Alternative III')
-
+legend('E','LS', 'GI')
+legend('Location','northwest')
 
 %Plotting The magnetic Field
 
@@ -118,8 +120,8 @@ loglog(h,PiecewiseMagnetic,'s','Linewidth',3,'color','r');
 loglog(h,H1MagneticError,'LineWidth',2,'Color','k')
 loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
 loglog(h,PiecewiseMagnetic,'Linewidth',2,'Color','r');
-set(gca,'FontSize',11)
-
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 
 hold on
 
@@ -180,8 +182,8 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-legend('Alternative I','Alternative II','Alternative III')
-
+legend('E','LS','GI')
+legend('Location','northwest')
 %xticks(tx)
 %yticks(ty)
 
@@ -230,14 +232,15 @@ H1MagneticError = [1.3485966107898497, 0.515270877390314, 0.22681651972361622, 0
 LSElectricError = [0.10257125554190669, 0.04721190787824579, 0.014863112248450432, 0.0036221150547460566, 0.0007750246467491926];
 LSMagneticError = [0.9331853803694574, 0.45839095006777036, 0.2045238649645601, 0.10048477597864197, 0.05047566104015773];
 
-PiecewiseElectric = [0.06401026321938064, 0.023402075732633493, 0.010531654108504205, 0.0026036967096083725, 0.0004036108290974887];
-PiecewiseMagnetic = [0.9047620434005373, 0.44128757090293436, 0.20226301729409893, 0.10020865068781082, 0.05040840568641607];
+%PiecewiseElectric = [0.06401026321938064, 0.023402075732633493, 0.010531654108504205, 0.0026036967096083725, 0.0004036108290974887];
+%PiecewiseMagnetic = [0.9047620434005373, 0.44128757090293436, 0.20226301729409893, 0.10020865068781082, 0.05040840568641607];
 %New trial
 %PiecewiseElectric = [0.0512350094121807, 0.023635417304269993, 0.007083805155839038, 0.002505228754786083, 0.0017995519817493328];
 %PiecewiseMagnetic = [0.8046433434267048, 0.4318927166148368, 0.20971710032225624, 0.10885451829483941, 0.05581372009656225];
 %secondtitle = 'On Perturbed squares';
-
-
+%Using the centroid
+PiecewiseElectric = [0.06399634115666948, 0.023420083928144014, 0.010532075496569855, 0.0026037656684741953, 0.00040364092518334354];
+PiecewiseMagnetic = [0.5496670990445647, 0.4000805616528737, 0.1985465027804371, 0.09980004534231372, 0.0502907138579932];
 %Plotting the electric field
 
 figure(1)
@@ -272,7 +275,8 @@ x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
 loglog(x,y,'r','LineWidth',2,'Color','k')
-set(gca,'FontSize',11)
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 %text(xseed*0.7+0.3*xnext,ynext+0.002,'1','FontSize',15)
 %text(xseed-0.002,0.5*yseed+0.5*ynext,'2','FontSize',15)
 
@@ -301,8 +305,8 @@ by = log10(upaxis);
 ty = ay:(by-ay)/10:by;
 ty = 10.^(ty);
 
-legend('Alternative I','Alternative II', 'Alternative III')
-
+legend('E','LS', 'GI')
+legend('Location','northwest')
 %xticks(tx)
 %yticks(ty)
 
@@ -352,8 +356,8 @@ loglog(x,y,'LineWidth',2,'Color','k')
 %text(xseed*0.7+0.3*xnext,ynext+0.01+0.01,'1','FontSize',15)
 %text(xseed-0.0015,0.5*yseed+0.5*ynext,'1','FontSize',15)
 
-set(gca,'FontSize',11)
-
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 
 
 
@@ -390,10 +394,8 @@ ty = 10.^(ty);
 %yticks(ty)
 
 
-legend('Alternative I','Alternative II','Alternative III')
-
-
-
+legend('E','LS','GI')
+legend('Location','northwest')
 
     case 'voronoi'
 %%%%%%%%%%%%%%%%%%%%%%%%%%Voronoi
@@ -416,13 +418,17 @@ H1MagneticError = [3.3226284919819693, 1.6827177392771193, 0.7955836030979955, 0
 LSElectricError = [0.3682110522050534, 0.15810796882225037, 0.03953170336385856, 0.010469264282408906, 0.003850058673999911];
 
 LSMagneticError = [2.697860282739323, 1.504084831376333, 0.74567700206153, 0.36236339153342956, 0.17296289875225518];
-
-PiecewiseElectric = [0.2844938672969478, 0.0957880521111463, 0.08430848536317731, 0.010034323386856954, 0.006058071946101146];
-PiecewiseMagnetic = [2.526393278930101, 1.4568176720822381, 0.7152759426644181, 0.35076653688237175, 0.1663073302200001];
+%Original (using sum x_i/N as the point)
+%PiecewiseElectric = [0.2844938672969478, 0.0957880521111463, 0.08430848536317731, 0.010034323386856954, 0.006058071946101146];
+%PiecewiseMagnetic = [2.526393278930101, 1.4568176720822381, 0.7152759426644181, 0.35076653688237175, 0.1663073302200001];
 %New
 %PiecewiseElectric = [0.2742857252259966, 0.09915374034956144, 0.08463413832732498, 0.01187454501946442, 0.006399316962147336];
 %PiecewiseMagnetic = [2.574014260656867, 1.495773132863638, 0.7397827741185969, 0.366456406959799, 0.1755798605185168];
 %secondtitle='Voronoi';
+%Using the centroid
+PiecewiseElectric = [0.27746878534448505, 0.09546265049240821, 0.08390558807034822, 0.009715678669095975, 0.006066470576797099];
+PiecewiseMagnetic = [2.534962998626922, 1.449425945308744, 0.7070098149587313, 0.34659967018971993, 0.16376959355435852];
+
 
 
 
@@ -461,8 +467,8 @@ loglog(x,y,'LineWidth',2,'Color','k')
 
 %text(xseed*0.7+0.3*xnext,ynext+0.001+0.0035,'1','FontSize',15)
 %text(xseed-0.0012,0.5*yseed+0.5*ynext,'2','FontSize',15)
-set(gca,'FontSize',11)
-
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 
 
 
@@ -501,8 +507,8 @@ ty = 10.^(ty);
 %yticks(ty)
 %grid on
 
-legend('Alternative I','Alternative II','Alternative III')
-
+legend('E','LS','GI')
+legend('Location','northwest')
 
 %Plotting The magnetic Field
 
@@ -549,8 +555,8 @@ loglog(x,y,'LineWidth',2,'Color','k')
 
 
 
-set(gca,'FontSize',11)
-
+set(gca,'FontSize',15)
+set(gca,'linewidth',2)
 
 
 
@@ -586,5 +592,6 @@ ty = 10.^(ty);
 %yticks(ty)
 
 %grid on
-legend('Alternative I','Alternative II','Alternative III')
+legend('E','LS','GI')
+legend('Location','northwest')
 end

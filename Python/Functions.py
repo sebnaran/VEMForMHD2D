@@ -1735,7 +1735,7 @@ def SetEnergy(T,dt,theta,Pfile,task):
     En = Energy(theta,dt,N,L1,L2,R1,R2)
     return En
 
-def EnergyPlot(Q,T,dt,theta,Pfile,task):
+def EnergyPlot(Q,N,dt,theta,Pfile,task):
     #In this function we will compute and save the norms of the electric, magnetic fields
     Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)  
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
@@ -1745,9 +1745,9 @@ def EnergyPlot(Q,T,dt,theta,Pfile,task):
         ME,MV,MJ = LSAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
     elif task == 'GI':
         ME,MV,MJ = GIAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations)
-    
+    T    =  dt*N
     time = np.arange(0,T,dt)
-    N    = len(time)
+    #N    = len(time)
 
     curl = primcurl(EdgeNodes,Nodes)
     D    = lil_matrix((len(Nodes),len(Nodes)))
@@ -1823,7 +1823,7 @@ def EnergyPlot(Q,T,dt,theta,Pfile,task):
     # ax2.plot(time, L)
     # ax3.plot(time, F)
     # plt.show()
-    return time,L,R,F
+    return L,R,F
 
 def SaveInmFile(name,aname,array):
     #This function will save the array in a matlab m-file with the name provided.
