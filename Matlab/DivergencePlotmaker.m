@@ -38,6 +38,12 @@ legend('Location','southeast')
 set(gca,'FontSize',15)
 set(gca,'linewidth',2)
 %Export with size width = 15cms length = 12cms
+test = imread('TriangularMesh.png'); 
+axes('position',[0.657 0.35 0.225 0.25]); 
+imagesc(test)
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[]);
+
 figure(2)
 clf
 plot(quadtime,H1quaddiv,'Linewidth',2,'color','k')
@@ -48,6 +54,11 @@ legend('E','LS', 'GI')
 legend('Location','southeast')
 set(gca,'FontSize',15)
 set(gca,'linewidth',2)
+test = imread('PerturbedSquaresMesh.png'); 
+axes('position',[0.657 0.35 0.225 0.25]); 
+imagesc(test)
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[]);
 
 figure(3)
 clf
@@ -59,3 +70,8 @@ legend('E','LS', 'GI')
 legend('Location','southeast')
 set(gca,'FontSize',15)
 set(gca,'linewidth',2)
+test = imread('VoronoiMesh.png'); 
+axes('position',[0.657 0.35 0.225 0.25]); 
+imagesc(test)
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[]);
