@@ -20,15 +20,17 @@ import matplotlib.pyplot as plt
 #B_t=-curl E
 #E=-nu curl B
 
+def T(x,y):
+    #This function maps the square [-1,1]^2 to [0,1]^2
+    return 0.5*x+0.5,0.5*y+0.5
+C = 5
 def Conductivity(x,y):
     #This is the diffusion coefficient
     #this function is scalar valued
     #Example 1
+    #return 1
+    #Energyplots 
     return 1
-    #Example 2
-    #num = 50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150
-    #den = 50*(math.exp(y)-math.exp(y))+(x**2+y**2)*(math.cos(x*y)+math.sin(x*y))
-    #return 2*(num)/(den)
 
 def EssentialBoundaryCond(x,y,t):
     #These are the essecial boundary conditions
@@ -39,11 +41,11 @@ def EssentialBoundaryCond(x,y,t):
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t) #Solution 4 Includes J cross B term
     #return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
     #example 1
-    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
+    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
     #Example 2
     #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
     #Energy Plots
-    #return math.sin(x+y)*math.exp(t)
+    return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
 
 def InitialCond(x,y):
     #These are the initial condition on the magnetic field
@@ -61,17 +63,17 @@ def InitialCond(x,y):
     #By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
     #return Bx,By #Solution 6 includes JxB
     #Example 1
-    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
-    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    return Bx,By 
+    #Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
+    #By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
+    #return Bx,By 
     #example 2
     #Bx = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
     #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
     #return Bx,By
-    #EnergyExample
-    #Bx = math.exp(x)*math.sin(y+1)
-    #By = math.exp(y)*math.cos(x+1)
-    #return Bx,By
+    #EnergyPlots
+    Bx = 50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)
+    By = 50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)
+    return Bx,By
 
 def ExactB(x,y,t):
     #This is the exact Magnetic field
@@ -82,13 +84,16 @@ def ExactB(x,y,t):
     #return math.exp(t+y),math.exp(t+x) #Solution#4  includes J cross B term
     #return 20*math.exp(y+t)+x*math.exp(t),20*math.exp(x+t)-y*math.exp(t)#Solution 5 Includes J cross B term
     #Example 1
-    Bx = ( 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y) )*math.exp(-t)
-    By = ( 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y) )*math.exp(-t)
-    return Bx,By#Solution 6 includes JxB
+    #Bx = ( 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y) )*math.exp(-t)
+    #By = ( 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y) )*math.exp(-t)
+    #return Bx,By#Solution 6 includes JxB
     #Example2
     #Bx,By = InitialCond(x,y)
     #return Bx*math.exp(-t),By*math.exp(-t)
-
+    #EnergyPlots
+    Bx = (50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y))*math.exp(C*t)
+    By = (50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y))*math.exp(C*t)
+    return Bx,By
 def ExactE(x,y,t):
     #This is the exact Electric field
     #return math.exp(t+x)-math.exp(t+y) #Solution #1 does not include J cross B term
@@ -98,10 +103,9 @@ def ExactE(x,y,t):
     #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t)#Solution 5 Includes J cross B term
 #   return ( 50*( math.exp(x)-math.exp(y) )+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 6 includes JxB
     #Example 1
-    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
-    #Example 2 
-    #Elec = EssentialBoundaryCond(x,y,t) 
-    #return Elec
+    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
+    #EnergyPlots
+    return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
 
 def J(x,y):
     #return 0,0 #for solutions that do not inclide J x B
@@ -114,16 +118,13 @@ def J(x,y):
 #    Jy = -( (x**2+y**2+1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
 #    return Jx,Jy #Solution 6 includes JxB
     #Example 1
-    Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
-    Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
-    return Jx,Jy 
+    #Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
+    #Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
+    #return Jx,Jy 
     #Example2, recall that due to how the code is written J = -u
-    #num1 = 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150
-    #dem1 = 50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
-    #num2 =-num1
-    #dem2 = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
-
-    #return num1/(2*dem1),num2/(2*dem2)
+    Jx =  ( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)) )
+    Jy = -( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)) )
+    return C*Jx,C*Jy
 
 def Poly1(x,y):
     return 1,0
@@ -1748,7 +1749,8 @@ def EnergyPlot(Q,N,dt,theta,Pfile,task):
     T    =  dt*N
     time = np.arange(0,T,dt)
     #N    = len(time)
-
+    MV   = MV/C
+    MJ   = MJ/C
     curl = primcurl(EdgeNodes,Nodes)
     D    = lil_matrix((len(Nodes),len(Nodes)))
     for i in InternalNodes:
