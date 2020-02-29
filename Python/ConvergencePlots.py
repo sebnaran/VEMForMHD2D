@@ -48,7 +48,8 @@ for task in Tasks:
         if task == 'GI':
             Bh,Eh,Berror,Eerror = GISolver(J,Nodes,EdgeNodes,ElementEdges,\
             BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,\
-                ExactE,ExactB,T,dt,theta)        
+                ExactE,ExactB,T,dt,theta)
+                        
         #VisualizeE(Eh,Nodes)
         VoronoiElectricErr[i] = Eerror
         VoronoiMagneticErr[i] = Berror

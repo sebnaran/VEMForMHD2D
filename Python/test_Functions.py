@@ -52,3 +52,45 @@ def test_coeffs2():
         assert abs(sum(w)-1)     < 0.0001
         assert abs(cx-xP)        < 0.0001
         assert abs(cy-yP)        < 0.0001
+
+def test_reconstruct():
+    def testB(x,y):
+        return 1,1
+    Pfile = 'HartPVh=0.0124216.txt'
+    Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations = ProcessedMesh(Pfile)
+    Bh = HighOrder7projE(testB,EdgeNodes,Nodes)
+    Bx = [0]*len(ElementEdges)
+    By = [0]*len(ElementEdges)
+    x  = [0]*len(ElementEdges)
+    y  = [0]*len(ElementEdges)
+    w  = 0
+
+    for Element in ElementEdges:
+        Basis          = [Poly1,Poly2,Poly]
+        Ori = Orientations[w]
+        ME,MV,MJ,Edges = NewLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori)
+        
+        n   = len(Element)
+        Dim = len(Basis)
+        NJ  = np.zeros((Dim,n))
+        for i in range(Dim):        
+            NJ[i,:] = np.transpose( LocprojE(Basis[i],Element,EdgeNodes,Nodes) )
+
+        NJ = np.transpose(NJ)
+        A  = np.transpose(NJ).dot(ME).dot(NJ) 
+
+        b  = np.transpose(NJ).dot(ME).dot(Bh[Element])
+
+        C  = np.linalg.inv(A).dot(b)
+        
+        xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
+        x[w]  = xP
+        y[w]  = yP
+        Bx[w] = C[0]+C[2]*xP
+        By[w] = C[1]+C[2]*yP
+        w     = w+1
+
+    #print(Bx)
+    #print(By)
+    assert (Bx[10]-1)<10^(-3)
+    assert (By[10]-1)<10^(-3)

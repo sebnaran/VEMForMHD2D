@@ -20,10 +20,8 @@ import matplotlib.pyplot as plt
 #B_t=-curl E
 #E=-nu curl B
 
-def T(x,y):
-    #This function maps the square [-1,1]^2 to [0,1]^2
-    return 0.5*x+0.5,0.5*y+0.5
 C = 5
+
 def Conductivity(x,y):
     #This is the diffusion coefficient
     #this function is scalar valued
@@ -45,7 +43,9 @@ def EssentialBoundaryCond(x,y,t):
     #Example 2
     #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
     #Energy Plots
-    return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
+    #return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
+    #Hartmann Flow 
+    return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
 
 def InitialCond(x,y):
     #These are the initial condition on the magnetic field
@@ -71,9 +71,11 @@ def InitialCond(x,y):
     #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
     #return Bx,By
     #EnergyPlots
-    Bx = 50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)
-    By = 50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)
-    return Bx,By
+    #Bx = 50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)
+    #By = 50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)
+    #return Bx,By
+    #Hartmann Flow
+    return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
 
 def ExactB(x,y,t):
     #This is the exact Magnetic field
@@ -91,9 +93,12 @@ def ExactB(x,y,t):
     #Bx,By = InitialCond(x,y)
     #return Bx*math.exp(-t),By*math.exp(-t)
     #EnergyPlots
-    Bx = (50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y))*math.exp(C*t)
-    By = (50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y))*math.exp(C*t)
-    return Bx,By
+    #Bx = (50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y))*math.exp(C*t)
+    #By = (50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y))*math.exp(C*t)
+    #return Bx,By
+    #Hartmann Flow
+    return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
+
 def ExactE(x,y,t):
     #This is the exact Electric field
     #return math.exp(t+x)-math.exp(t+y) #Solution #1 does not include J cross B term
@@ -105,7 +110,9 @@ def ExactE(x,y,t):
     #Example 1
     #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
     #EnergyPlots
-    return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
+    #return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
+    #Hartmann Flow
+    return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
 
 def J(x,y):
     #return 0,0 #for solutions that do not inclide J x B
@@ -121,10 +128,11 @@ def J(x,y):
     #Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
     #Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
     #return Jx,Jy 
-    #Example2, recall that due to how the code is written J = -u
-    Jx =  ( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)) )
-    Jy = -( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)) )
-    return C*Jx,C*Jy
+    #Energyplots2, recall that due to how the code is written J = -u
+    #Jx =  ( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)) )
+    #Jy = -( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)) )
+    #return C*Jx,C*Jy
+    return -(math.cosh(0.5)-math.cosh(y))/(2*math.sinh(0.5)),0
 
 def Poly1(x,y):
     return 1,0
@@ -965,8 +973,6 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     l = 0
     k = 0
     for Polynomial in Basis:
-        
-        
         for j in range(len(Vertices)-1):
             Vertex = Vertices[j]
             x = Vertex[0]
@@ -974,12 +980,12 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
             
             Px,Py = Polynomial(x,y)
             
-            PolyCoordinates[2*j,l] = Px
+            PolyCoordinates[2*j,l]   = Px
             PolyCoordinates[2*j+1,l] = Py
             
             
     
-            if k==0:
+            if k == 0:
                 Jx,Jy = J(x,y)
                 JMatrix[j,2*j] = -Jy
                 JMatrix[j,2*j+1] = Jx
@@ -1827,8 +1833,14 @@ def EnergyPlot(Q,N,dt,theta,Pfile,task):
     # plt.show()
     return L,R,F
 
+# def VisualizeB(Bh,ElementEdges):
+#     Bx = np.zeros(())
+#     By = np.zeros(())
+#     for Element in ElementEdges:
+
+
 def SaveInmFile(name,aname,array):
-    #This function will save the array in a matlab m-file with the name provided.
+    #This function will save the array with name aname in a matlab m-file with the name.
     with open("../Matlab/"+name+".m",'w') as file:
         file.writelines(aname+" = [")
         for e in range(len(array)):
@@ -1837,4 +1849,106 @@ def SaveInmFile(name,aname,array):
             else:
                 file.writelines( ","+str( array[e] ) )
         
-        file.writelines('];')   
+        file.writelines('];')
+
+def HartSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+    #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
+    #the given time.
+    #The boundary conditions are given above 
+    time = np.arange(0,T,dt)
+    InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    ME,MV,MJ = EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    
+    #Let us construct the required matrices
+    
+    curl = primcurl(EdgeNodes,Nodes) #the primary curl
+    #D = np.zeros((len(Nodes),len(Nodes))) #this matrix will is explained in the pdf
+    D = lil_matrix((len(Nodes),len(Nodes)))
+    for i in InternalNodes:
+        D[i,i]=1
+    D = D.tocsr()
+   
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = D.dot(Aprime)
+    #A = np.zeros((NumberInternalNodes,NumberInternalNodes))
+    A = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+    
+
+    for i in range(NumberInternalNodes):
+        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+    A = A.tocsr()
+    
+    b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+    b = D.dot(b)
+    
+    #Bh = projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder3projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder5projE(InitialCond,EdgeNodes,Nodes)
+    Bh = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+    Bh = np.transpose(Bh)[0]
+  
+    Eh = np.zeros(len(Nodes))
+    
+    
+    EhInterior = np.zeros(len(Nodes)) #This is Eh in the interior
+    
+    EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
+   
+    
+    
+    for t in time:
+        
+        #We update the time dependant boundary conditions
+        #i.e. The boundary values of the electric field
+        for NodeNumber in BoundaryNodes:
+            Node = Nodes[NodeNumber]
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        
+        #Solve  for the internal values of the electric field
+        
+        W1 = b.dot(Bh)
+        W2 = Aprime.dot(EhBoundary)
+        
+        #EhInterior[InternalNodes] = np.linalg.solve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        #EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #f = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #EhInterior[InternalNodes] = f
+        
+        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        Eh = EhInterior+EhBoundary
+        
+        
+        #Update the magnetic field
+        Bh = Bh-curl.dot(dt*Eh) 
+           
+        
+    #Now we compute the error
+    def ContB(x,y):
+        return ExactB(x,y,T)
+    def ContE(x,y):
+        return ExactE(x,y,T-(1-theta)*dt)
+    
+    Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
+    Eex = projV(ContE,Nodes)
+    
+    Bex = np.transpose(Bex)[0]
+    Eex = np.transpose(Eex)[0]
+    
+    B = Bh-Bex
+    E = Eh-Eex
+    #MagneticError = np.transpose(B).dot(ME).dot(B)
+    #ElectricError = np.transpose(E).dot(MV).dot(E)
+    
+    MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
+    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
+    
+    #MagneticError = math.sqrt(MagneticError[0,0])
+    #ElectricError = math.sqrt(ElectricError[0,0])
+    
+    MagneticError = math.sqrt(MagneticError)
+    ElectricError = math.sqrt(ElectricError)
+    
+    return Bh,Eh,MagneticError,ElectricError
+   

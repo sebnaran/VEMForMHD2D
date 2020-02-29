@@ -1,6 +1,6 @@
-shape = 'quads';
+%shape = 'quads';
 %shape = 'triangles';
-%shape = 'voronoi';
+shape = 'voronoi';
 
 switch shape
     case 'triangles'
@@ -71,8 +71,8 @@ hold on
 loglog(h,LSElectricError,'d','LineWidth',3,'color','b');
 loglog(h,PiecewiseElectric,'s','Linewidth',3,'color','r');
 loglog(h,H1ElectricError,'LineWidth',2,'Color','k');
-loglog(h,LSElectricError,'LineWidth',2,'Color','b');
-loglog(h,PiecewiseElectric,'Linewidth',2,'Color','r');
+loglog(h,LSElectricError,'--','LineWidth',2,'Color','b');
+loglog(h,PiecewiseElectric,':','Linewidth',2,'Color','r');
 
 set(gca,'FontSize',15)
 set(gca,'linewidth',2)
@@ -135,8 +135,8 @@ hold on
 loglog(h,LSMagneticError,'d','LineWidth',3,'color','b')
 loglog(h,PiecewiseMagnetic,'s','Linewidth',3,'color','r');
 loglog(h,H1MagneticError,'LineWidth',2,'Color','k')
-loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
-loglog(h,PiecewiseMagnetic,'Linewidth',2,'Color','r');
+loglog(h,LSMagneticError,'--','LineWidth',2,'Color','b')
+loglog(h,PiecewiseMagnetic,':','Linewidth',2,'Color','r');
 set(gca,'FontSize',15)
 set(gca,'linewidth',2)
 
@@ -286,8 +286,8 @@ hold on
 loglog(h,LSElectricError,'d','LineWidth',3,'color','b')
 loglog(h,PiecewiseElectric,'s','Linewidth',3,'color','r');
 loglog(h,H1ElectricError,'LineWidth',2,'Color','k')
-loglog(h,LSElectricError,'LineWidth',2,'Color','b')
-loglog(h,PiecewiseElectric,'Linewidth',2,'color','r');
+loglog(h,LSElectricError,'--','LineWidth',2,'Color','b')
+loglog(h,PiecewiseElectric,':','Linewidth',2,'color','r');
 %loglog(h,10^(1)*h.^(1.8))
 hold on
 %Pick a basis point for the triangle
@@ -365,8 +365,8 @@ hold on
 loglog(h,LSMagneticError,'d','LineWidth',3,'color','b')
 loglog(h,PiecewiseMagnetic,'s','Linewidth',3,'color','r');
 loglog(h,H1MagneticError,'LineWidth',2,'Color','k')
-loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
-loglog(h,PiecewiseMagnetic,'Linewidth',2,'color','r');
+loglog(h,LSMagneticError,'--','LineWidth',2,'Color','b')
+loglog(h,PiecewiseMagnetic,':','Linewidth',2,'color','r');
 
 hold on
 
@@ -494,8 +494,8 @@ hold on
 loglog(h,LSElectricError,'d','LineWidth',3,'color','b')
 loglog(h,PiecewiseElectric,'s','Linewidth',3,'color','r');
 loglog(h,H1ElectricError,'LineWidth',2,'Color','k')
-loglog(h,LSElectricError,'LineWidth',2,'Color','b')
-loglog(h,PiecewiseElectric,'Linewidth',2,'color','r');
+loglog(h,LSElectricError,'--','LineWidth',2,'Color','b')
+loglog(h,PiecewiseElectric,':','Linewidth',2,'color','r');
 hold on
 %Pick a basis point for the triangle
 xseed = 0.9*h(5)+h(4)*0.1;
@@ -580,8 +580,8 @@ hold on
 loglog(h,LSMagneticError,'d','LineWidth',3,'color','b')
 loglog(h,PiecewiseMagnetic,'s','Linewidth',3,'color','r');
 loglog(h,H1MagneticError,'LineWidth',2,'Color','k')
-loglog(h,LSMagneticError,'LineWidth',2,'Color','b')
-loglog(h,PiecewiseMagnetic,'Linewidth',2,'color','r');
+loglog(h,LSMagneticError,'--','LineWidth',2,'Color','b')
+loglog(h,PiecewiseMagnetic,':','Linewidth',2,'color','r');
 
 
 hold on

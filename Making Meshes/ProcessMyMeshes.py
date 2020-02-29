@@ -18,8 +18,8 @@ from Functions import *
 #          '/home/sebnaran/Codes/VEMForMHD2D/NewMeshes/Th=0.00156773.txt',\
 #          '/home/sebnaran/Codes/VEMForMHD2D/NewMeshes/Qh=0.00549451.txt',\
 #          '/home/sebnaran/Codes/VEMForMHD2D/NewMeshes/Qh=0.00275482.txt']
-Files = ['Vh=0.00442309.txt','Vh=0.00221383.txt','Th=0.00313997.txt','Th=0.00156773.txt','Qh=0.00549451.txt','Qh=0.00275482.txt']
-
+#Files = ['Vh=0.00442309.txt','Vh=0.00221383.txt','Th=0.00313997.txt','Th=0.00156773.txt','Qh=0.00549451.txt','Qh=0.00275482.txt']
+Files = ['Vh=0.0124216.txt']
 for file in Files:
     print('Making P'+file)
     Nodes,EdgeNodes,ElementEdges,BoundaryNodes = Mesh(file)
