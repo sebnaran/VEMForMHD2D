@@ -1851,6 +1851,19 @@ def SaveInmFile(name,aname,array):
         
         file.writelines('];')
 
+def tderivB(t,Bh,curl,A1,A,B,Nodes,BoundaryNodes,InternalNodes,EhBoundary,EhInterior):
+    #this function will compute the time derivative of B at t, Bh
+    for NodeNumber in BoundaryNodes:
+        Node                   = Nodes[NodeNumber]
+        EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t)
+    
+    W1 = B.dot(Bh)
+    W2 = A1.dot(EhBoundary)
+    EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]+W2[InternalNodes]) 
+    
+    Eh = EhInterior+EhBoundary
+    return -curl.dot(Eh)
+
 def HartSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
     #the given time.
@@ -1868,22 +1881,15 @@ def HartSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essenti
         D[i,i]=1
     D = D.tocsr()
    
-    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
-    Aprime = D.dot(Aprime)
-    #A = np.zeros((NumberInternalNodes,NumberInternalNodes))
+    A1 = D.dot(MV)
     A = lil_matrix((NumberInternalNodes,NumberInternalNodes))
-    
-
     for i in range(NumberInternalNodes):
-        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+        A[i,:] = A1[InternalNodes[i],InternalNodes]
     A = A.tocsr()
     
-    b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
-    b = D.dot(b)
-    
-    #Bh = projE(InitialCond,EdgeNodes,Nodes)
-    #Bh = HighOrder3projE(InitialCond,EdgeNodes,Nodes)
-    #Bh = HighOrder5projE(InitialCond,EdgeNodes,Nodes)
+    B = np.transpose(curl).dot(ME)-MJ
+    B = D.dot(B)
+
     Bh = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
     Bh = np.transpose(Bh)[0]
   
@@ -1898,57 +1904,38 @@ def HartSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essenti
     
     for t in time:
         
-        #We update the time dependant boundary conditions
-        #i.e. The boundary values of the electric field
-        for NodeNumber in BoundaryNodes:
-            Node = Nodes[NodeNumber]
-            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
-        
-        #Solve  for the internal values of the electric field
-        
-        W1 = b.dot(Bh)
-        W2 = Aprime.dot(EhBoundary)
-        
-        #EhInterior[InternalNodes] = np.linalg.solve(A,W1[InternalNodes]-W2[InternalNodes]) 
-        
-        #EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
-        #f = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
-        #EhInterior[InternalNodes] = f
-        
-        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
-        
-        Eh = EhInterior+EhBoundary
-        
-        
+        k1 = tderivB(t,Bh,curl,A1,A,B,Nodes,BoundaryNodes,InternalNodes,EhBoundary,EhInterior)
+        k2 = tderivB(t+0.5*dt,Bh+0.5*k1,curl,A1,A,B,Nodes,BoundaryNodes,InternalNodes,EhBoundary,EhInterior)
+        k3 = tderivB(t+0.5*dt,Bh+0.5*k2,curl,A1,A,B,Nodes,BoundaryNodes,InternalNodes,EhBoundary,EhInterior)
+        k4 = tderivB(t+dt,Bh+k3,curl,A1,A,B,Nodes,BoundaryNodes,InternalNodes,EhBoundary,EhInterior)
         #Update the magnetic field
-        Bh = Bh-curl.dot(dt*Eh) 
+        Bh = Bh+(dt/6)*(k1+k2+k3+k4) 
            
         
     #Now we compute the error
     def ContB(x,y):
         return ExactB(x,y,T)
-    def ContE(x,y):
-        return ExactE(x,y,T-(1-theta)*dt)
+    #def ContE(x,y):
+    #    return ExactE(x,y,T-(1-theta)*dt)
     
     Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
-    Eex = projV(ContE,Nodes)
+    #Eex = projV(ContE,Nodes)
     
     Bex = np.transpose(Bex)[0]
-    Eex = np.transpose(Eex)[0]
+    #Eex = np.transpose(Eex)[0]
     
     B = Bh-Bex
-    E = Eh-Eex
+    #E = Eh-Eex
     #MagneticError = np.transpose(B).dot(ME).dot(B)
     #ElectricError = np.transpose(E).dot(MV).dot(E)
     
     MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
-    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
+    #ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
     
     #MagneticError = math.sqrt(MagneticError[0,0])
     #ElectricError = math.sqrt(ElectricError[0,0])
     
     MagneticError = math.sqrt(MagneticError)
-    ElectricError = math.sqrt(ElectricError)
+    #ElectricError = math.sqrt(ElectricError)
     
-    return Bh,Eh,MagneticError,ElectricError
-   
+    return Bh,MagneticError
