@@ -32,63 +32,41 @@ def Conductivity(x,y):
 
 def EssentialBoundaryCond(x,y,t):
     #These are the essecial boundary conditions
-    #return math.exp(t+x)-math.exp(t+y) #Solution#1 does not include J cross B term
-    #return 1 #Solution #2 does not include J cross B term but is linear
-    #return -math.exp(y+t) #Solution #3 it includes J cross B term
-    #return math.exp(t+x)-math.exp(t+y)#+math.exp(t) #Solution 4 includes J cross B term
-    #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t) #Solution 4 Includes J cross B term
-    #return ( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 5 includ
     #example 1
-    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
-    #Example 2
-    #return (50*(math.exp(y)-math.exp(y))+math.cos(x*y)+math.sin(x*y)+150)*math.exp(-t)
+    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)     
     #Energy Plots
     #return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
     #Hartmann Flow 
-    return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
+    #return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
 
+def InteriorCond(x,y):
+    if abs(x-1)<10**(-5) or abs(x+1)<10**(-5) or abs(y-1)<10**(-5) or abs(y+1)<10**(-5):
+        return 0
+    else:
+        return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
 def InitialCond(x,y):
     #These are the initial condition on the magnetic field
     #r must be a 2 dimensional array
     #this function is vector valued
     #It must be divergence free
-    
-    #return math.exp(y),math.exp(x) #Solution #1 does not include J cross B term
-    #return 2*y,3*x #Solution #1 does not include J cross B term but is linear
-    #return math.exp(y),0 #Solution #3 it includes J cross B term
-    #return math.exp(y),math.exp(x) #Solution#4  includes J cross B term
-    #return 20*math.exp(y)+x,20*math.exp(x)-y#Solution 5 Includes J cross B term
-    
-    #Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
-    #By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    #return Bx,By #Solution 6 includes JxB
     #Example 1
-    #Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
-    #By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
-    #return Bx,By 
-    #example 2
-    #Bx = -50*math.exp(y)+x*math.cos(x*y)-x*math.sin(x*y)
-    #By =  50*math.exp(x)+y*math.cos(x*y)-y*math.sin(x*y)
-    #return Bx,By
+    Bx = 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)
+    By = 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)
+    return Bx,By 
     #EnergyPlots
     #Bx = 50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)
     #By = 50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)
     #return Bx,By
     #Hartmann Flow
-    return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
-
+    #return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
+    #return 1,1
 def ExactB(x,y,t):
     #This is the exact Magnetic field
     #Must be divergence free
-    #return math.exp(t+y),math.exp(t+x) #Solution #1 does not include J cross B term
-    #return 2*y,3*x #Solution #2 does not include J cross B term but is linear
-    #return math.exp(y+t),0 #Solution #3 it includes J cross B term
-    #return math.exp(t+y),math.exp(t+x) #Solution#4  includes J cross B term
-    #return 20*math.exp(y+t)+x*math.exp(t),20*math.exp(x+t)-y*math.exp(t)#Solution 5 Includes J cross B term
     #Example 1
-    #Bx = ( 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y) )*math.exp(-t)
-    #By = ( 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y) )*math.exp(-t)
-    #return Bx,By#Solution 6 includes JxB
+    Bx = ( 50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y) )*math.exp(-t)
+    By = ( 50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y) )*math.exp(-t)
+    return Bx,By#Solution 6 includes JxB
     #Example2
     #Bx,By = InitialCond(x,y)
     #return Bx*math.exp(-t),By*math.exp(-t)
@@ -97,42 +75,28 @@ def ExactB(x,y,t):
     #By = (50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y))*math.exp(C*t)
     #return Bx,By
     #Hartmann Flow
-    return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
+    #return (math.sinh(y)-2*y*math.sinh(0.5))/(2*math.sinh(0.5)),1
 
 def ExactE(x,y,t):
     #This is the exact Electric field
-    #return math.exp(t+x)-math.exp(t+y) #Solution #1 does not include J cross B term
-    #return 1 #Solution #2 does not include J cross B term but is linear
-    #return -math.exp(y+t) #Solution#3  includes J cross B term
-    #return math.exp(t+x)-math.exp(t+y)+math.exp(t) #Solution 4 Includes J cross B term
-    #return 20*math.exp(t+x)-20*math.exp(t+y)-x*y*math.exp(t)#Solution 5 Includes J cross B term
-#   return ( 50*( math.exp(x)-math.exp(y) )+math.cos(x*y)+math.sin(x*y) )*math.exp(t) #Solution 6 includes JxB
     #Example 1
-    #return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
+    return -( 50*(math.exp(x)-math.exp(y))+math.cos(x*y)+math.sin(x*y) )*math.exp(-t)
     #EnergyPlots
     #return C*math.exp(C*t)*(50*math.exp(x)-50*math.exp(y)-math.sin(x*y)-math.cos(x*y))
     #Hartmann Flow
-    return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
+    #return ( 2*math.sinh(0.5)-math.cosh(0.5) )/( 2*math.sinh(0.5) )
 
 def J(x,y):
-    #return 0,0 #for solutions that do not inclide J x B
-    #return math.exp(y),0 #Solution#3  includes J cross B term
-    #return 2*math.exp(-x),math.exp(-y) #Solution#4  includes J cross B term
-    #return 0,03s
-    #return -(x*y)/(40*math.exp(x)-2*y),(x*y)/(40*math.exp(y)+2*x) #solution 5 includes JxB
-    
-#    Jx = ( (x**2+y**2+1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
-#    Jy = -( (x**2+y**2+1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
-#    return Jx,Jy #Solution 6 includes JxB
     #Example 1
-    #Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
-    #Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
-    #return Jx,Jy 
+    Jx = ( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(x)-y*math.sin(x*y)+y*math.cos(x*y)) )
+    Jy = -( (x**2+y**2-1)*(math.sin(x*y)+math.cos(x*y))-100*math.exp(x)+100*math.exp(y) )/( 2*(50*math.exp(y)+x*math.sin(x*y)-x*math.cos(x*y)) )
+    return Jx,Jy 
     #Energyplots2, recall that due to how the code is written J = -u
     #Jx =  ( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(x)+y*math.sin(x*y)-y*math.cos(x*y)) )
     #Jy = -( (-x**2-y**2-1)*(math.sin(x*y)+math.cos(x*y)) )/( 2*(50*math.exp(y)-x*math.sin(x*y)+x*math.cos(x*y)) )
     #return C*Jx,C*Jy
-    return -(math.cosh(0.5)-math.cosh(y))/(2*math.sinh(0.5)),0
+    #Hartmann Flow
+    #return -(math.cosh(0.5)-math.cosh(y))/(2*math.sinh(0.5)),0
 
 def Poly1(x,y):
     return 1,0
@@ -476,7 +440,137 @@ def LocalMassMatrix(N,R,n,A,nu):
     gamma=np.trace(R.dot(np.transpose(R)))/(n*A*nu)
     #And finally we put the two matrices together
     return M0+M1*gamma
+def MFDMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
+    #This routine will compute the local mass matrix in the edge-based space E
+    #Here we must ensure that the orientation of the elements is such that
+    #We have an orientation for the edges that respects stoke's theorem
+    n = len(Element)
+    Dim = len(Basis)
+    xP,yP,A,Vertices,Edges = Centroid(Element,EdgeNodes,Nodes,Ori)
+    nu = Conductivity(xP,yP)
+    NE = np.zeros((n,2))
+    RE = np.zeros((n,2))
+    NV = np.ones((n,1))*nu
+    RV = np.zeros((n,1))
     
+    for i in range(n):
+        x1 = Vertices[i][0]
+        y1 = Vertices[i][1]
+        x2 = Vertices[i+1][0]
+        y2 = Vertices[i+1][1]
+        lengthEdge = math.sqrt((x2-x1)**2+(y2-y1)**2)
+        #print('dif in x')
+        #print(x2-x1)
+        #print('dif in y')
+        #print(y2-y1)
+        #print('Length e')
+        #print(lengthEdge)
+        NE[i][0] = (y2-y1)*Ori[i]*lengthEdge**-1
+        NE[i][1] = (x1-x2)*Ori[i]*lengthEdge**-1
+        RE[i][0] = (0.5*(x1+x2)-xP)*Ori[i]*lengthEdge #These formulas are derived in the tex-document
+        RE[i][1] = (0.5*(y1+y2)-yP)*Ori[i]*lengthEdge
+    ME = LocalMassMatrix(NE,RE,n,A,1)
+    #WE=LocalMassMatrix(RE,NE,n,A,1)
+    
+    
+    
+    x1n = Vertices[n-1][0] #first vertex of n-1th-edge
+    y1n = Vertices[n-1][1]
+    
+    x2n = Vertices[0][0]
+    y2n = Vertices[0][1] #second vertex of n-1th edge
+    
+    x11 = x2n #first vertex of first edge
+    y11 = y2n
+    
+    x21 = Vertices[1][0]
+    y21 = Vertices[1][1]  #second vertex of first edge
+    
+    omegan2 = (x2n-x1n)*((yP-y2n)+(2*yP-y1n-y2n))/6
+    omega11 = (x21-x11)*((yP-y11)+(2*yP-y11-y21))/6
+    RV[0] = omegan2+omega11
+   
+    for i in range(1,n):
+        
+        x1iminusone = Vertices[i-1][0] #first vertex of i-1th-edge
+        y1iminusone = Vertices[i-1][1]
+               
+        x2iminusone = Vertices[i][0]    
+        y2iminusone = Vertices[i][1] #second vertex of i-1th edge
+
+        x1i = x2iminusone #first vertex of i+1 edge
+        y1i = y2iminusone
+    
+        x2i = Vertices[i+1][0] #second vertex of i+1 edge
+        y2i = Vertices[i+1][1]  
+        
+        omega2iminusone = (x2iminusone-x1iminusone)*((yP-y2iminusone)+\
+                                                   (2*yP-y1iminusone-y2iminusone))/6
+        omega1i = (x2i-x1i)*((yP-y1i)+(2*yP-y2i-y1i))/6   
+        
+        RV[i] = omega2iminusone+omega1i
+        
+    MV = LocalMassMatrix(NV,RV,n,A,nu)
+    #WV=LocalMassMatrix(RV,NV,n,A,nu)
+    
+    NJ = np.zeros((Dim,n))
+    
+    
+    for i in range(Dim):        
+        NJ[i,:] = np.transpose( LocprojE(Basis[i],Element,EdgeNodes,Nodes) )
+    
+    
+    NJ = np.transpose(NJ)
+    #print(NJ)
+    b = np.transpose(NJ).dot(ME)
+    #print(b)
+    #print(ME)
+    #print(NJ)
+    #print(np.transpose(NJ).dot(ME).dot(NJ))
+    #print(np.linalg.inv( np.transpose(NJ).dot(ME).dot(NJ) ) )
+    
+    MJ = np.linalg.pinv( np.transpose(NJ).dot(ME).dot(NJ) )
+    #print(MJ)
+    MJ = MJ.dot(b)
+    #print(MJ)
+
+
+
+    
+    PolyCoordinates = np.zeros((2*(len(Vertices)-1),Dim))
+    JMatrix = np.zeros( (len(Vertices)-1,2*(len(Vertices)-1)) ) 
+                       
+    l = 0
+    k = 0
+    for Polynomial in Basis:
+        
+        
+        for j in range(len(Vertices)-1):
+            Vertex = Vertices[j]
+            x = Vertex[0]
+            y = Vertex[1]
+            
+            Px,Py = Polynomial(x,y)
+            
+            PolyCoordinates[2*j,l] = Px
+            PolyCoordinates[2*j+1,l] = Py
+            
+            
+    
+            if k==0:
+                Jx,Jy = J(x,y)
+                JMatrix[j,2*j] = -Jy
+                JMatrix[j,2*j+1] = Jx
+                
+            j = j+1
+        k = 1        
+        l = l+1
+    
+    MJ = JMatrix.dot(PolyCoordinates).dot(MJ)
+    #MJ = np.transpose(MJ).dot(MV)
+    MJ = MV.dot(MJ)
+    #print(MJ)
+    return ME,MV,MJ,Edges    
 #The following three functions are necessary for the construction of the 
 #mass matrix in the nodal space.
 def m1(x,y,xP,yP):
@@ -998,6 +1092,66 @@ def PieceWiseLocalMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori):
     MJ = MV.dot(MJ)
     return ME,MV,MJ,Edges
 
+def MFDAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations):
+    #This routine takes a mesh and assembles the global mass matrices and their inverses
+    Basis          = [Poly1,Poly2,Poly]
+    
+    NumberElements = len(ElementEdges)
+    NumberEdges    = len(EdgeNodes)
+    NumberNodes    = len(Nodes)
+    
+    
+    ME = lil_matrix((NumberEdges,NumberEdges))
+    #ME = np.zeros((NumberEdges,NumberEdges))
+    #WE=np.zeros((NumberEdges,NumberEdges))
+    MV = lil_matrix((NumberNodes,NumberNodes))
+    #MV = np.zeros((NumberNodes,NumberNodes))
+    #WV=np.zeros((NumberNodes,NumberNodes))
+    MJ = lil_matrix((NumberNodes,NumberEdges))
+    #MJ = np.zeros((NumberNodes,NumberEdges))
+    
+    #loop over the elements
+    k = 0
+    for Element in ElementEdges: 
+        #Compute the local mass and stiffness matrices
+        #LocME,LocWE,LocMV,LocWV,Edges=LocalMEWEMVWV(Element,EdgeNodes,Nodes) 
+        Ori = Orientations[k]
+        k = k+1
+        LocME,LocMV,LocMJ,Edges = MFDMEWEMVWV(J,Basis,Element,EdgeNodes,Nodes,Ori) 
+        
+        #The assembly of the edge-based functions is easier since Element
+        #Contains the order in which the edges ought to be assembled
+       
+        for j in range(len(Element)):
+            ME[Element[j],Element] = ME[Element[j],Element] + LocME[j]
+            #WE[Element[j],Element] = WE[Element[j],Element] + LocWE[j]
+        n=len(Edges)-1
+        ElementVertices = [0]*n
+        
+        for i in range(n):
+            ElementVertices[i] = Edges[i][0]
+         
+        for j in range(len(Element)):
+            MV[ElementVertices[j],ElementVertices] = MV[ElementVertices[j],ElementVertices]+LocMV[j]
+            MJ[ElementVertices[j],Element] = MJ[ElementVertices[j],Element]+LocMJ[j]
+            #WV[ElementVertices[j],ElementVertices]=WV[ElementVertices[j],ElementVertices]+LocWV[j]
+        
+        #print(MJ)
+        #i = 0
+        #print(np.linalg.norm(LocMJ))
+        #for Edge in Element:
+        #    MJ[Edge,ElementVertices] = MJ[Edge,ElementVertices]+LocMJ[i]
+        #    i = i+1
+        #for j in range(len(Element)):
+            #MJ[ElementVertices[j],Element] = MJ[ElementVertices[j],Element]+LocMJ[j]
+    #return ME,WE,MV,WV
+    
+    ME = ME.tocsr()
+    MV = MV.tocsr()
+    MJ = MJ.tocsr()
+    
+    return ME,MV,MJ
+
 def EAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations):
     #This routine takes a mesh and assembles the global mass matrices and their inverses
     Basis          = [Poly1,Poly2,Poly]
@@ -1356,7 +1510,112 @@ def primdiv(ElementEdges,EdgeNodes,Nodes,Orientations):
 
 
 #Solver
+def MFDSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
+    #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
+    #the given time.
+    #The boundary conditions are given above 
+    time = np.arange(0,T,dt)
+    InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    ME,MV,MJ = MFDAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
+    
+    
+    #Let us construct the required matrices
+    
+    curl = primcurl(EdgeNodes,Nodes) #the primary curl
+    #D = np.zeros((len(Nodes),len(Nodes))) #this matrix will is explained in the pdf
+    D = lil_matrix((len(Nodes),len(Nodes)))
+    for i in InternalNodes:
+        D[i,i]=1
+    D = D.tocsr()
+   
+    Aprime = MV+theta*dt*( ( np.transpose(curl) ).dot(ME)+MJ ).dot(curl)#MV.dot(MJ) ).dot(curl)
+    Aprime = D.dot(Aprime)
+    #A = np.zeros((NumberInternalNodes,NumberInternalNodes))
+    A = lil_matrix((NumberInternalNodes,NumberInternalNodes))
+    
 
+    for i in range(NumberInternalNodes):
+        A[i,:] = Aprime[InternalNodes[i],InternalNodes]
+    A = A.tocsr()
+    
+    b = np.transpose(curl).dot(ME)+MJ#+MV.dot(MJ)
+    b = D.dot(b)
+    
+    #Bh = projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder3projE(InitialCond,EdgeNodes,Nodes)
+    #Bh = HighOrder5projE(InitialCond,EdgeNodes,Nodes)
+    Bh = HighOrder7projE(InitialCond,EdgeNodes,Nodes)
+    Bh = np.transpose(Bh)[0]
+  
+    Eh = np.zeros(len(Nodes))
+    
+    
+    EhInterior = np.zeros(len(Nodes)) #This is Eh in the interior
+    
+    EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
+   
+    
+    a = 0
+    for t in time:
+        
+        #We update the time dependant boundary conditions
+        #i.e. The boundary values of the electric field
+        for NodeNumber in BoundaryNodes:
+            Node = Nodes[NodeNumber]
+            EhBoundary[NodeNumber] = EssentialBoundaryCond(Node[0],Node[1],t+theta*dt)
+        
+        #Solve  for the internal values of the electric field
+        
+        W1 = b.dot(Bh)
+        W2 = Aprime.dot(EhBoundary)
+        
+        #EhInterior[InternalNodes] = np.linalg.solve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        #EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #f = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        #EhInterior[InternalNodes] = f
+        
+        EhInterior[InternalNodes] = spsolve(A,W1[InternalNodes]-W2[InternalNodes]) 
+        
+        Eh = EhInterior+EhBoundary
+        
+        
+        #Update the magnetic field
+        Bh = Bh-dt*curl.dot(Eh) 
+          
+     
+    #Now we compute the error
+    def ContB(x,y):
+        return ExactB(x,y,T)
+    def ContE(x,y):
+        return ExactE(x,y,T-(1-theta)*dt)
+    
+    Bex = HighOrder7projE(ContB,EdgeNodes,Nodes)
+    Eex = projV(ContE,Nodes)
+    
+    Bex = np.transpose(Bex)[0]
+    Eex = np.transpose(Eex)[0]
+    
+    B = Bh-Bex
+    E = Eh-Eex
+    #Eintex = projV(InteriorCond,Nodes)
+    #Eintex = np.transpose(Eintex)[0]
+    #EI = EhInterior - Eintex
+    #InteriorError = (MV.dot(EI).dot(EI))/(MV.dot(Eintex).dot(Eintex))
+    #InteriorError = math.sqrt(InteriorError)  
+    #MagneticError = np.transpose(B).dot(ME).dot(B)
+    #ElectricError = np.transpose(E).dot(MV).dot(E)
+    
+    MagneticError = (ME.dot(B).dot(B))/(ME.dot(Bex).dot(Bex))
+    ElectricError = (MV.dot(E).dot(E))/(MV.dot(Eex).dot(Eex))
+    
+    #MagneticError = math.sqrt(MagneticError[0,0])
+    #ElectricError = math.sqrt(ElectricError[0,0])
+    
+    MagneticError = math.sqrt(MagneticError)
+    ElectricError = math.sqrt(ElectricError)
+    
+    return Bh,Eh,MagneticError,ElectricError
 
 def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
@@ -1403,7 +1662,7 @@ def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialB
     EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
    
     
-    
+    a = 0
     for t in time:
         
         #We update the time dependant boundary conditions
@@ -1430,8 +1689,8 @@ def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialB
         
         #Update the magnetic field
         Bh = Bh-dt*curl.dot(Eh) 
-           
-        
+        a = a+1   
+    print(a)    
     #Now we compute the error
     def ContB(x,y):
         return ExactB(x,y,T)
@@ -1446,6 +1705,11 @@ def ESolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialB
     
     B = Bh-Bex
     E = Eh-Eex
+    #Eintex = projV(InteriorCond,Nodes)
+    #Eintex = np.transpose(Eintex)[0]
+    #EI = EhInterior - Eintex
+    #InteriorError = (MV.dot(EI).dot(EI))/(MV.dot(Eintex).dot(Eintex))
+    #InteriorError = math.sqrt(InteriorError)  
     #MagneticError = np.transpose(B).dot(ME).dot(B)
     #ElectricError = np.transpose(E).dot(MV).dot(E)
     
@@ -1504,7 +1768,7 @@ def LSSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
    
     
-    
+    a = 0 
     for t in time:
         
         #We update the time dependant boundary conditions
@@ -1531,8 +1795,8 @@ def LSSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
         
         #Update the magnetic field
         Bh = Bh-dt*curl.dot(Eh) 
-           
-        
+        a = a+1   
+    print(a)    
     #Now we compute the error
     def ContB(x,y):
         return ExactB(x,y,T)
@@ -1559,7 +1823,12 @@ def LSSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     MagneticError = math.sqrt(MagneticError)
     ElectricError = math.sqrt(ElectricError)
     
-    return Bh,Eh,MagneticError,ElectricError
+    Eintex = projV(InteriorCond,Nodes)
+    Eintex = np.transpose(Eintex)[0]
+    EI = EhInterior - Eintex
+    InteriorError = (MV.dot(EI).dot(EI))/(MV.dot(Eintex).dot(Eintex))
+    InteriorError = math.sqrt(InteriorError)  
+    return Bh,Eh,EhInterior,MagneticError,ElectricError,InteriorError,t
 
 def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,EssentialBoundaryCond,InitialCond,ExactE,ExactB,T,dt,theta):
     #This routine will, provided a mesh, final time and time step, return the values of the electric and magnetic field at
@@ -1605,7 +1874,7 @@ def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
    
     
-    
+    a = 0
     for t in time:
         
         #We update the time dependant boundary conditions
@@ -1632,8 +1901,8 @@ def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
         
         #Update the magnetic field
         Bh = Bh-dt*curl.dot(Eh) 
-           
-        
+        a = a+1   
+    print(a)    
     #Now we compute the error
     def ContB(x,y):
         return ExactB(x,y,T)
@@ -1659,8 +1928,12 @@ def GISolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essential
     
     MagneticError = math.sqrt(MagneticError)
     ElectricError = math.sqrt(ElectricError)
-    
-    return Bh,Eh,MagneticError,ElectricError
+    Eintex = projV(InteriorCond,Nodes)
+    Eintex = np.transpose(Eintex)[0]
+    EI = EhInterior - Eintex
+    InteriorError = (MV.dot(EI).dot(EI))/(MV.dot(Eintex).dot(Eintex)) 
+    InteriorError = math.sqrt(InteriorError)   
+    return Bh,Eh,EhInterior,MagneticError,ElectricError,InteriorError,t
 
 
 

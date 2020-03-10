@@ -160,7 +160,7 @@ ynext = 10^(b)*xnext^slope;
 x = [xseed, xseed, xnext, xseed];
 y = [yseed, ynext, ynext, yseed];
 
-loglog(x,y,'LineWidth',2,'Color','k')
+loglog(x,y,'Linewidth',2,Color','k')
 
 
 %text(xseed*0.7+0.3*xnext,ynext+0.01+0.01+0.01+0.01,'1','FontSize',15)
