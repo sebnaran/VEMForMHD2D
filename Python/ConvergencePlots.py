@@ -133,7 +133,7 @@ for task in Tasks:
                 ExactE,ExactB,T,dt,theta)  
         QuadElectricErr[i] = Eerror
         QuadMagneticErr[i] = Berror
-        QuadIntErr[i]      = IntErr
+        #QuadIntErr[i]      = IntErr
         #    divB                         = DivMat.dot(Bh)
         #    DivErr                       = 0
         #    NEl                          = len(ElementEdges)
@@ -175,7 +175,7 @@ for task in Tasks:
 
     TriangleElectricErr = [0]*len(ProcessedFiles)
     TriangleMagneticErr = [0]*len(ProcessedFiles)
-    TriangleIntErr      = [0]*len(ProcessedFiles)
+    #TriangleIntErr      = [0]*len(ProcessedFiles)
     i                  = 0
     for Pfile in ProcessedFiles:
         dt = 0.05*h[i]**2
@@ -199,7 +199,7 @@ for task in Tasks:
         #VisualizeE(Eh,Nodes)
         TriangleElectricErr[i] = Eerror
         TriangleMagneticErr[i] = Berror
-        TriangleIntErr[i]      = IntErr
+        #TriangleIntErr[i]      = IntErr
         # divB                         = DivMat.dot(Bh)
         # DivErr                       = 0
         # NEl                          = len(ElementEdges)

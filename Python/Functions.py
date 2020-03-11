@@ -1554,8 +1554,6 @@ def MFDSolver(J,Nodes,EdgeNodes,ElementEdges,BoundaryNodes,Orientations,Essentia
     
     EhBoundary = np.zeros(len(Nodes))   #This is Eh on the boundary
    
-    
-    a = 0
     for t in time:
         
         #We update the time dependant boundary conditions

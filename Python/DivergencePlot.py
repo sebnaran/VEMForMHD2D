@@ -27,11 +27,12 @@ for Pfile in ProcessedFiles:
 
     time   = np.arange(0,T,dt)
     InternalNodes,NumberInternalNodes = InternalObjects(BoundaryNodes,Nodes)
+    ME,MV,MJ = MFDAssembly(J,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     #ME,MV,MJ = NewAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations) #compute the mass matrices
     #ME,MV,MJ = LeastSquaresAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
-    ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
+    #ME,MV,MJ = PiecewiseAssembly(J,Basis,Nodes,EdgeNodes,ElementEdges,Orientations)
     
-    print('Piecewise Matrices Assembled')
+    #print('Piecewise Matrices Assembled')
 
     #Let us construct the required matrices   
     curl = primcurl(EdgeNodes,Nodes) #the primary curl
@@ -95,7 +96,7 @@ for Pfile in ProcessedFiles:
     #Now we record the time vector and divergence vextor in a text file.
     print('recording results')
     if y == 0:
-        with open('TrigSimulations.m','w') as file:
+        with open('MFDTrigSimulations.m','w') as file:
         #saving time first
             file.writelines('trigtime = [')
             for e in range(len(time)):
@@ -120,7 +121,7 @@ for Pfile in ProcessedFiles:
             file.write('\n')
 
     if y == 1:
-        with open('QuadSimulations.m','w') as file:
+        with open('MFDQuadSimulations.m','w') as file:
         #saving time first
             file.writelines('quadtime = [')
             for e in range(len(time)):
@@ -145,7 +146,7 @@ for Pfile in ProcessedFiles:
             file.write('\n')
         
     if y == 2:
-        with open('VoronoiSimulations.m','w') as file:
+        with open('MFDVoronoiSimulations.m','w') as file:
         #saving time first
             file.writelines('voronoitime = [')
             for e in range(len(time)):
